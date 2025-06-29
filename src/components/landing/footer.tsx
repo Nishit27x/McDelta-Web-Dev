@@ -1,6 +1,18 @@
+'use client';
+
 import Link from 'next/link';
-import { Youtube, Twitter, Instagram } from 'lucide-react';
+import { Youtube } from 'lucide-react';
 import DiscordIcon from '../icons/discord-icon';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const DiamondIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -37,9 +49,24 @@ export default function Footer() {
           </nav>
           <div className="flex items-center space-x-4 justify-center md:justify-end">
             <a href="https://discord.gg/kSE8qCUY" aria-label="Discord" className="text-muted-foreground hover:text-accent transition-colors"><DiscordIcon className="w-6 h-6" /></a>
-            <a href="#" aria-label="YouTube" className="text-muted-foreground hover:text-accent transition-colors"><Youtube className="w-6 h-6" /></a>
-            <a href="#" aria-label="Twitter" className="text-muted-foreground hover:text-accent transition-colors"><Twitter className="w-6 h-6" /></a>
-            <a href="#" aria-label="Instagram" className="text-muted-foreground hover:text-accent transition-colors"><Instagram className="w-6 h-6" /></a>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button aria-label="YouTube" className="text-muted-foreground hover:text-accent transition-colors">
+                  <Youtube className="w-6 h-6" />
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Coming Soon!</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Our YouTube channel is under construction. Keep Supporting!
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogAction>Got it</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-border/50 text-center text-muted-foreground text-sm">
