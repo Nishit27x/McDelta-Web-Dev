@@ -39,12 +39,12 @@ export default function Features() {
     <section id="features" className="py-16 md:py-24">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold font-headline">Server Features</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">Server Features</h2>
           <p className="text-lg text-muted-foreground mt-2">What makes McDelta SMP unique.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature) => (
-            <Card key={feature.title} className="text-center hover:border-primary transition-all duration-300 hover:-translate-y-2 hover:shadow-xl shadow-lg">
+            <Card key={feature.title} className="text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-primary/20">
               <CardHeader className="items-center space-y-4">
                 <div className="p-4 bg-primary/10 rounded-full">
                   {feature.icon}

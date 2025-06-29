@@ -21,12 +21,12 @@ export default function Join() {
   return (
     <section id="join" className="py-16 md:py-24 bg-card text-card-foreground">
       <div className="container mx-auto px-4 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold font-headline">Join the Server</h2>
+        <h2 className="text-3xl md:text-4xl font-bold">Join the Server</h2>
         <p className="text-lg text-muted-foreground mt-2 max-w-2xl mx-auto">
           Ready to start your adventure? Copy the IP below or join our Discord to get started!
         </p>
         <div className="mt-8 flex flex-col md:flex-row items-center justify-center gap-6">
-          <Card className="bg-background/50">
+          <Card className="bg-background/50 shadow-inner-lg">
             <CardContent className="p-4 flex items-center gap-4">
               <span className="font-mono text-lg tracking-widest">{serverIp}</span>
               <Button variant="ghost" size="icon" onClick={copyToClipboard} aria-label="Copy server IP">
@@ -44,7 +44,7 @@ export default function Join() {
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-md mx-auto">
             <Card>
                 <CardContent className="p-4 flex items-center gap-4">
-                    <Users className="w-8 h-8 text-accent" />
+                    <Users className="w-8 h-8 text-primary" />
                     <div>
                         <p className="font-bold text-2xl">69 / 100</p>
                         <p className="text-sm text-muted-foreground">Players Online</p>
@@ -53,7 +53,7 @@ export default function Join() {
             </Card>
             <Card>
                 <CardContent className="p-4 flex items-center gap-4">
-                    <Signal className="w-8 h-8 text-accent" />
+                    <Signal className="w-8 h-8 text-primary" />
                     <div>
                         <p className="font-bold text-2xl">99.9%</p>
                         <p className="text-sm text-muted-foreground">Server Uptime</p>

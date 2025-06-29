@@ -32,7 +32,7 @@ export default function Hero() {
                   priority={index === 0}
                   data-ai-hint={image.hint}
                 />
-                <div className="absolute inset-0 bg-black/70" />
+                <div className="absolute inset-0 bg-black/60" />
               </div>
             </CarouselItem>
           ))}
@@ -44,11 +44,11 @@ export default function Hero() {
       </Carousel>
 
       <div className="relative z-10 p-4 text-white">
-        <h1 className="font-jokerman tracking-wider drop-shadow-lg text-5xl md:text-7xl lg:text-8xl">
-          <span className="block text-2xl md:text-4xl font-body font-normal">Welcome to</span>
+        <h1 className="font-jokerman tracking-wider drop-shadow-xl text-5xl md:text-7xl lg:text-8xl">
+          <span className="block text-2xl md:text-4xl font-headline font-bold">Welcome to</span>
           McDelta SMP
         </h1>
-        <p className="mt-4 text-lg md:text-xl max-w-2xl mx-auto drop-shadow-md">
+        <p className="mt-4 text-lg md:text-xl max-w-2xl mx-auto drop-shadow-lg">
           Experience the ultimate Minecraft Lifesteal SMP. Forge alliances, conquer enemies, and build your legacy.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-4">
