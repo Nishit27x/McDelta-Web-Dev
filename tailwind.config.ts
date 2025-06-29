@@ -18,7 +18,8 @@ export default {
     extend: {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
-        headline: ['Jokerman', 'serif'],
+        headline: ['Rye', 'serif'],
+        jokerman: ['Jokerman', 'serif'],
         code: ['monospace'],
       },
       colors: {

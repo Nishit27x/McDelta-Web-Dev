@@ -44,7 +44,7 @@ export default function Hero() {
       </Carousel>
 
       <div className="relative z-10 p-4 text-white">
-        <h1 className="font-headline tracking-wider drop-shadow-lg text-5xl md:text-7xl lg:text-8xl">
+        <h1 className="font-jokerman tracking-wider drop-shadow-lg text-5xl md:text-7xl lg:text-8xl">
           <span className="block text-2xl md:text-4xl font-body font-normal">Welcome to</span>
           McDelta SMP
         </h1>

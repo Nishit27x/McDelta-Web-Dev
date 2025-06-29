@@ -27,7 +27,7 @@ export default function Header() {
       <div className="container flex h-14 items-center">
         <Link href="#" className="mr-6 flex items-center space-x-2">
           <DiamondIcon className="h-6 w-6 text-accent" />
-          <span className="hidden font-bold sm:inline-block font-headline">
+          <span className="hidden font-bold sm:inline-block font-jokerman">
             McDelta SMP
           </span>
         </Link>
@@ -51,7 +51,7 @@ export default function Header() {
               <nav className="grid gap-6 text-lg font-medium pt-10">
                 <Link href="#" className="flex items-center gap-2 text-lg font-semibold mb-4">
                   <DiamondIcon className="h-6 w-6 text-accent" />
-                  <span className="font-headline">McDelta SMP</span>
+                  <span className="font-jokerman">McDelta SMP</span>
                 </Link>
                 <Link href="#features" className="text-muted-foreground hover:text-foreground">Features</Link>
                 <Link href="#gallery" className="text-muted-foreground hover:text-foreground">Gallery</Link>
