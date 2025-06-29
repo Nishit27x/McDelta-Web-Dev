@@ -209,6 +209,7 @@ function AdminAuthFlow() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [pattern, setPattern] = useState<number[]>([]);
+  const [patternKey, setPatternKey] = useState(() => Date.now());
   const [error, setError] = useState('');
 
   const correctPattern = [0, 2, 8, 6];
@@ -220,6 +221,11 @@ function AdminAuthFlow() {
   const clearPattern = () => {
       setPattern([]);
   }
+
+  const handleResetPattern = () => {
+    setPattern([]);
+    setPatternKey(Date.now());
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -237,7 +243,7 @@ function AdminAuthFlow() {
         if (!isPasswordCorrect) errorMsg += 'Check password. ';
         if (!isPatternCorrect) errorMsg += 'Check pattern. ';
       setError(errorMsg.trim());
-      setPattern([]);
+      handleResetPattern();
     }
   };
 
@@ -297,8 +303,13 @@ function AdminAuthFlow() {
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter password" />
             </div>
             <div className="space-y-2">
-              <Label><Shuffle className="inline-block mr-2 h-4 w-4" />Security Pattern</Label>
-              <PatternLock onPatternComplete={handlePatternComplete} onClear={clearPattern} />
+              <div className="flex justify-between items-center">
+                 <Label><Shuffle className="inline-block mr-2 h-4 w-4" />Security Pattern</Label>
+                 <Button type="button" variant="ghost" size="sm" onClick={handleResetPattern}>
+                    Reset
+                 </Button>
+              </div>
+              <PatternLock key={patternKey} onPatternComplete={handlePatternComplete} onClear={clearPattern} />
             </div>
             {error && <p className="text-sm text-destructive text-center">{error}</p>}
             {error ? (
