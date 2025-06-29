@@ -34,7 +34,7 @@ export default function Footer() {
             <Link href="#join" className="text-muted-foreground hover:text-accent transition-colors">Join</Link>
           </nav>
           <div className="flex items-center space-x-4 justify-center md:justify-end">
-            <a href="https://discord.gg/placeholder" aria-label="Discord" className="text-muted-foreground hover:text-accent transition-colors"><DiscordIcon className="w-6 h-6" /></a>
+            <a href="https://discord.gg/kSE8qCUY" aria-label="Discord" className="text-muted-foreground hover:text-accent transition-colors"><DiscordIcon className="w-6 h-6" /></a>
             <a href="#" aria-label="YouTube" className="text-muted-foreground hover:text-accent transition-colors"><Youtube className="w-6 h-6" /></a>
             <a href="#" aria-label="Twitter" className="text-muted-foreground hover:text-accent transition-colors"><Twitter className="w-6 h-6" /></a>
             <a href="#" aria-label="Instagram" className="text-muted-foreground hover:text-accent transition-colors"><Instagram className="w-6 h-6" /></a>
