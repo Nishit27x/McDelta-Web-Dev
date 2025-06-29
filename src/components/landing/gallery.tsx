@@ -27,7 +27,7 @@ export default function Gallery() {
           {galleryImages.map((img) => (
             <div
               key={img.src}
-              className="relative aspect-video rounded-lg overflow-hidden group cursor-pointer shadow-md"
+              className="relative aspect-video rounded-xl overflow-hidden group cursor-pointer shadow-xl"
               onClick={() => setSelectedImage(img.src)}
             >
               <Image
@@ -54,7 +54,7 @@ export default function Gallery() {
               alt="Enlarged gallery view"
               width={1600}
               height={900}
-              className="w-full h-auto rounded-lg shadow-2xl"
+              className="w-full h-auto rounded-xl shadow-2xl"
             />
           )}
         </DialogContent>

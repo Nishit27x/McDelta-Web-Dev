@@ -18,7 +18,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
-        headline: ['Rye', 'serif'],
+        headline: ['"Exo 2"', 'sans-serif'],
         jokerman: ['Jokerman', 'serif'],
         code: ['monospace'],
       },

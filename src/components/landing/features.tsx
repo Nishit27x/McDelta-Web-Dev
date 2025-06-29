@@ -8,27 +8,27 @@ const features = [
     description: 'Eliminate other players to steal their hearts. But be careful, you can lose hearts too!',
   },
   {
-    icon: <Swords className="w-8 h-8 text-accent" />,
+    icon: <Swords className="w-8 h-8 text-primary" />,
     title: 'PvP Events',
     description: 'Participate in regular PvP tournaments and events to win exclusive rewards and glory.',
   },
   {
-    icon: <ScrollText className="w-8 h-8 text-accent" />,
+    icon: <ScrollText className="w-8 h-8 text-primary" />,
     title: 'Side Quests',
     description: 'Embark on unique quests to uncover the lore of the server and earn powerful items.',
   },
   {
-    icon: <Blocks className="w-8 h-8 text-accent" />,
+    icon: <Blocks className="w-8 h-8 text-primary" />,
     title: 'Custom Builds',
     description: 'Explore breathtaking custom-built spawns, dungeons, and arenas crafted by our team.',
   },
   {
-    icon: <MessageCircle className="w-8 h-8 text-accent" />,
+    icon: <MessageCircle className="w-8 h-8 text-primary" />,
     title: 'Active Discord',
     description: 'Join our vibrant Discord community to chat, trade, and team up with other players.',
   },
   {
-    icon: <Star className="w-8 h-8 text-accent" />,
+    icon: <Star className="w-8 h-8 text-primary" />,
     title: 'Player-driven Economy',
     description: 'Engage in a dynamic economy where players control the market through shops and trades.',
   },
@@ -44,9 +44,9 @@ export default function Features() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature) => (
-            <Card key={feature.title} className="text-center hover:border-accent transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+            <Card key={feature.title} className="text-center hover:border-primary transition-all duration-300 hover:-translate-y-2 hover:shadow-xl shadow-lg">
               <CardHeader className="items-center space-y-4">
-                <div className="p-4 bg-muted rounded-full">
+                <div className="p-4 bg-primary/10 rounded-full">
                   {feature.icon}
                 </div>
                 <CardTitle>{feature.title}</CardTitle>

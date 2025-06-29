@@ -16,7 +16,7 @@ export default function About() {
               With custom features, regular events, and an active player base, there's always something new to discover. Whether you're a seasoned PvP veteran or a master builder, you'll find your place in the world of McDelta.
             </p>
           </div>
-          <div className="relative aspect-video rounded-lg overflow-hidden group shadow-lg">
+          <div className="relative aspect-video rounded-xl overflow-hidden group shadow-2xl">
             <Image
               src="https://placehold.co/1280x720.png"
               alt="Server Trailer Thumbnail"

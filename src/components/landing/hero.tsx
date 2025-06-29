@@ -32,7 +32,7 @@ export default function Hero() {
                   priority={index === 0}
                   data-ai-hint={image.hint}
                 />
-                <div className="absolute inset-0 bg-black/60" />
+                <div className="absolute inset-0 bg-black/70" />
               </div>
             </CarouselItem>
           ))}

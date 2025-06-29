@@ -117,9 +117,9 @@ export default function Feedback() {
               <CarouselContent>
                 {recentFeedback.map((fb, index) => (
                   <CarouselItem key={index}>
-                    <Card className="bg-background border-2 border-dashed border-border">
+                    <Card className="bg-card border-2 border-primary/20">
                       <CardContent className="p-6 flex flex-col items-center text-center">
-                        <Avatar className="w-16 h-16 mb-4 border-2 border-accent">
+                        <Avatar className="w-16 h-16 mb-4 border-2 border-primary">
                           <AvatarImage src={fb.avatar} data-ai-hint={fb.hint}/>
                           <AvatarFallback>{fb.name.charAt(0)}</AvatarFallback>
                         </Avatar>
