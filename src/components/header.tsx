@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useUserSession } from "@/contexts/user-session-context";
 
 const DiamondIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -29,6 +30,8 @@ const DiamondIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function Header() {
+  const { session } = useUserSession();
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
@@ -45,7 +48,9 @@ export default function Header() {
           <Link href="/rules" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Rules</Link>
           <Link href="/status" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Player Status</Link>
           <Link href="/feedback" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Feedback</Link>
-          <Link href="/server-admin" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Admin</Link>
+          {session?.isAdmin && (
+            <Link href="/server-admin" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Admin</Link>
+          )}
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-2">
           <Button asChild>
@@ -70,7 +75,9 @@ export default function Header() {
                 <Link href="/rules" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Rules</Link>
                 <Link href="/status" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Player Status</Link>
                 <Link href="/feedback" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Feedback</Link>
-                <Link href="/server-admin" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Admin</Link>
+                {session?.isAdmin && (
+                  <Link href="/server-admin" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Admin</Link>
+                )}
                 <Link href="/#join" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Join</Link>
               </nav>
             </SheetContent>

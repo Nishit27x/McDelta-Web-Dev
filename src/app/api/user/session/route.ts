@@ -9,6 +9,10 @@ const gamertagSchema = z.object({
   gamertag: z.string().min(3).max(20),
 });
 
+const getAdminGamertags = () => {
+    return (process.env.ADMIN_GAMERTAGS || '').split(',').map(g => g.trim().toLowerCase()).filter(Boolean);
+}
+
 export async function GET(request: NextRequest) {
   let ip = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim();
   if (!ip) {
@@ -27,9 +31,16 @@ export async function GET(request: NextRequest) {
 
     if (snapshot.exists()) {
       const userData = snapshot.val();
+      const adminGamertags = getAdminGamertags();
+
+      const responseData = {
+          ...userData,
+          isAdmin: adminGamertags.includes(userData.gamertag.toLowerCase())
+      };
+
       // Update last seen timestamp
       await ref.update({ lastSeen: new Date().toISOString() });
-      return NextResponse.json(userData, { status: 200 });
+      return NextResponse.json(responseData, { status: 200 });
     } else {
       return NextResponse.json({ error: 'User not found.' }, { status: 404 });
     }
@@ -64,6 +75,8 @@ export async function POST(request: NextRequest) {
   }
   
   const { gamertag } = validation.data;
+  const adminGamertags = getAdminGamertags();
+  const isAdmin = adminGamertags.includes(gamertag.toLowerCase());
 
   try {
     const db = admin.database();
@@ -97,7 +110,12 @@ export async function POST(request: NextRequest) {
       statusCode = 201;
     }
     
-    return NextResponse.json(userData, { status: statusCode });
+    const responseData = {
+        ...userData,
+        isAdmin: isAdmin,
+    };
+
+    return NextResponse.json(responseData, { status: statusCode });
   } catch (error) {
     console.error('Error creating or updating user session:', error);
     return NextResponse.json({ error: 'Failed to save user session.' }, { status: 500 });

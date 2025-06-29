@@ -8,6 +8,7 @@ interface UserSession {
   ip: string;
   createdAt: string;
   lastSeen: string;
+  isAdmin?: boolean;
 }
 
 interface UserSessionContextType {
