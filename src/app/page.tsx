@@ -5,7 +5,6 @@ import Features from '@/components/landing/features';
 import Gallery from '@/components/landing/gallery';
 import Feedback from '@/components/landing/feedback';
 import Join from '@/components/landing/join';
-import PlayerStatus from '@/components/landing/player-status';
 import Footer from '@/components/landing/footer';
 
 export default function Home() {
@@ -19,7 +18,6 @@ export default function Home() {
         <Gallery />
         <Feedback />
         <Join />
-        <PlayerStatus />
       </main>
       <Footer />
     </div>

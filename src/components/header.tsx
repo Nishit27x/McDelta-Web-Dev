@@ -43,7 +43,7 @@ export default function Header() {
           <Link href="/#features" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Features</Link>
           <Link href="/#gallery" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Gallery</Link>
           <Link href="/rules" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Rules</Link>
-          <Link href="/#player-status" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Player Status</Link>
+          <Link href="/status" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Player Status</Link>
           <Link href="/#feedback" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Feedback</Link>
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-2">
@@ -67,7 +67,7 @@ export default function Header() {
                 <Link href="/#features" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Features</Link>
                 <Link href="/#gallery" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Gallery</Link>
                 <Link href="/rules" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Rules</Link>
-                <Link href="/#player-status" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Player Status</Link>
+                <Link href="/status" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Player Status</Link>
                 <Link href="/#feedback" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Feedback</Link>
                 <Link href="/#join" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Join</Link>
               </nav>

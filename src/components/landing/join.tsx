@@ -99,7 +99,7 @@ export default function Join() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Link href="/#player-status">
+                  <Link href="/status">
                     <Card className="cursor-pointer transition-colors hover:bg-muted/50">
                         <CardContent className="p-4 flex items-center gap-4">
                             <Users className="w-8 h-8 text-primary" />
