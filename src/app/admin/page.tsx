@@ -214,7 +214,14 @@ function AdminAuthFlow() {
   const [patternKey, setPatternKey] = useState(() => Date.now());
   const [error, setError] = useState('');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [isFirebaseReady, setIsFirebaseReady] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Check if the auth object from firebase-client was successfully initialized.
+    // It will be null if the required `NEXT_PUBLIC_` env vars are missing.
+    setIsFirebaseReady(!!auth);
+  }, []);
 
   const correctPattern = [2, 5, 8];
 
@@ -236,14 +243,6 @@ function AdminAuthFlow() {
     setError('');
     setIsAuthenticating(true);
 
-    // Add a specific check for Firebase client configuration at the very beginning.
-    if (!auth) {
-      setError("Session Error: Client-side Firebase credentials are not configured in .env.local. Cannot create a secure session.");
-      setIsAuthenticating(false);
-      handleResetPattern();
-      return;
-    }
-
     const isUsernameCorrect = username === 'ADMINDELTA';
     const isPasswordCorrect = password === 'delta@admin';
     const isPatternCorrect = JSON.stringify(pattern) === JSON.stringify(correctPattern);
@@ -263,7 +262,7 @@ function AdminAuthFlow() {
         if (!loginResponse.ok) throw new Error(loginData.error || `Failed to start session for ${adminGamertag}.`);
 
         // Step 2: Sign in with the custom token on the client
-        const userCredential = await signInWithCustomToken(auth, loginData.customToken);
+        const userCredential = await signInWithCustomToken(auth!, loginData.customToken);
         const idToken = await userCredential.user.getIdToken();
 
         // Step 3: Send the ID token to the server to create a session cookie
@@ -296,6 +295,36 @@ function AdminAuthFlow() {
       setIsAuthenticating(false);
     }
   };
+
+  // This is a special state for when Firebase isn't configured at all.
+  // It provides a clear, full-page explanation of the problem.
+  if (!isFirebaseReady) {
+    return (
+      <main className="flex-grow container mx-auto px-4 py-16 flex items-center justify-center">
+        <Card className="w-full max-w-lg text-center">
+          <CardHeader>
+              <div className="mx-auto bg-destructive/10 p-4 rounded-full w-fit"><ShieldAlert className="h-10 w-10 text-destructive" /></div>
+            <CardTitle className="mt-4">Configuration Error</CardTitle>
+            <CardDescription>Administrative features cannot be loaded.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-destructive mb-4">
+              Essential client-side Firebase credentials (starting with `NEXT_PUBLIC_`) are missing from your environment configuration (`.env.local` file).
+            </p>
+            <p className="text-muted-foreground text-sm">
+              Please ensure you have copied the `.env.local.example` file to `.env.local` and filled in all the required Firebase variables. You may need to restart your development server after creating the file.
+            </p>
+              <Button asChild className="w-full mt-6">
+                <Link href="/">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Home
+                </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </main>
+    )
+  }
 
   if (isAuthenticated) {
     return (
