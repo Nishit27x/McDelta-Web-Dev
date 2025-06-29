@@ -3,7 +3,17 @@
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
-import { Menu } from "lucide-react";
+import { Menu, Coffee } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const DiamondIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -32,12 +42,31 @@ export default function Header() {
           </span>
         </Link>
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          <Link href="/#features" className="text-muted-foreground transition-colors hover:text-foreground">Features</Link>
-          <Link href="/#gallery" className="text-muted-foreground transition-colors hover:text-foreground">Gallery</Link>
-          <Link href="/rules" className="text-muted-foreground transition-colors hover:text-foreground">Rules</Link>
-          <Link href="/#feedback" className="text-muted-foreground transition-colors hover:text-foreground">Feedback</Link>
+          <Link href="/#features" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Features</Link>
+          <Link href="/#gallery" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Gallery</Link>
+          <Link href="/rules" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Rules</Link>
+          <Link href="/#feedback" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Feedback</Link>
         </nav>
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        <div className="flex flex-1 items-center justify-end space-x-2">
+           <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline">
+                <Coffee className="h-4 w-4 mr-2" />
+                Buy us a Coffee!
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Coming Soon!</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Coming Soon, Keep Supporting!
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogAction>Got it</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <Button asChild>
             <Link href="/#join">Join Now</Link>
           </Button>
@@ -54,11 +83,28 @@ export default function Header() {
                   <DiamondIcon className="h-6 w-6 text-accent" />
                   <span className="font-jokerman">McDelta SMP</span>
                 </Link>
-                <Link href="/#features" className="text-muted-foreground hover:text-foreground">Features</Link>
-                <Link href="/#gallery" className="text-muted-foreground hover:text-foreground">Gallery</Link>
-                <Link href="/rules" className="text-muted-foreground hover:text-foreground">Rules</Link>
-                <Link href="/#feedback" className="text-muted-foreground hover:text-foreground">Feedback</Link>
-                <Link href="/#join" className="text-muted-foreground hover:text-foreground">Join</Link>
+                <Link href="/#features" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Features</Link>
+                <Link href="/#gallery" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Gallery</Link>
+                <Link href="/rules" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Rules</Link>
+                <Link href="/#feedback" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Feedback</Link>
+                <Link href="/#join" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Join</Link>
+                <AlertDialog>
+                  <AlertDialogTrigger className="flex items-center text-muted-foreground hover:text-foreground text-left w-full">
+                    <Coffee className="h-5 w-5 mr-2" />
+                    <span>Buy us a Coffee!</span>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Coming Soon!</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Coming Soon, Keep Supporting!
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogAction>Got it</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </nav>
             </SheetContent>
           </Sheet>
