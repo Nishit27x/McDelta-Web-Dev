@@ -11,7 +11,7 @@ import Footer from '@/components/landing/footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ArrowLeft, Upload, Edit, Trash2, ShieldAlert, Loader2, LogIn, KeyRound, Lock, Shuffle } from 'lucide-react';
+import { ArrowLeft, Upload, Edit, Trash2, ShieldAlert, Loader2, LogIn, KeyRound, Lock, Shuffle, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -303,16 +303,16 @@ function AdminAuthFlow() {
       <main className="flex-grow container mx-auto px-4 py-16 flex items-center justify-center">
         <Card className="w-full max-w-lg text-center">
           <CardHeader>
-              <div className="mx-auto bg-destructive/10 p-4 rounded-full w-fit"><ShieldAlert className="h-10 w-10 text-destructive" /></div>
-            <CardTitle className="mt-4">Configuration Error</CardTitle>
-            <CardDescription>Administrative features cannot be loaded.</CardDescription>
+              <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit"><Lock className="h-10 w-10 text-primary" /></div>
+            <CardTitle className="mt-4">Admin Setup Required</CardTitle>
+            <CardDescription>Administrative features require a secure connection to your Firebase project.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-destructive mb-4">
-              Essential client-side Firebase credentials (starting with `NEXT_PUBLIC_`) are missing from your environment configuration (`.env.local` file).
+            <p className="text-primary mb-4">
+              Essential client-side Firebase credentials (starting with `NEXT_PUBLIC_`) are missing from your environment configuration.
             </p>
             <p className="text-muted-foreground text-sm">
-              Please ensure you have copied the `.env.local.example` file to `.env.local` and filled in all the required Firebase variables. You may need to restart your development server after creating the file.
+             To enable admin features, please copy the `.env.local.example` file to a new file named `.env.local` and fill in all the required Firebase variables. You may need to restart your development server after creating the file. This is required for the site to work when hosted.
             </p>
               <Button asChild className="w-full mt-6">
                 <Link href="/">
