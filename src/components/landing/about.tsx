@@ -1,4 +1,3 @@
-import Image from 'next/image';
 
 export default function About() {
   return (
@@ -15,12 +14,10 @@ export default function About() {
             </p>
           </div>
           <div className="relative aspect-square rounded-xl overflow-hidden group shadow-2xl shadow-primary/20 transition-all duration-300 ease-in-out hover:shadow-primary/40 hover:shadow-2xl hover:scale-105">
-            <Image
+            <img
               src="/__fshost__/user-images/1"
               alt="McDelta SMP promotional image featuring a character in a Minecraft world"
-              fill
-              unoptimized
-              className="object-cover transition-transform duration-300 group-hover:scale-110"
+              className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
             />
           </div>
         </div>
