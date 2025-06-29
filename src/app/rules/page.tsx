@@ -146,7 +146,8 @@ export default function RulesPage() {
       <main className="flex-grow container mx-auto px-4 py-16 md:py-24">
         <div className="text-center mb-12">
           <Image
-            src="/images/916d7d6f-21f4-4114-ae9e-e81804862f9f.png"
+            src="https://placehold.co/1000x563.png"
+            data-ai-hint="minecraft banner"
             alt="McDelta SMP Rules Banner"
             width={1000}
             height={563}
