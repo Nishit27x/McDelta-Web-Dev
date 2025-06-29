@@ -51,7 +51,7 @@ export default function Footer() {
             <a href="https://discord.gg/kSE8qCUY" aria-label="Discord" className="text-muted-foreground hover:text-accent transition-colors"><DiscordIcon className="w-6 h-6" /></a>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <button aria-label="YouTube" className="text-muted-foreground hover:text-accent transition-colors">
+                <button aria-label="YouTube" className="text-muted-foreground hover:text-accent transition-colors" suppressHydrationWarning>
                   <Youtube className="w-6 h-6" />
                 </button>
               </AlertDialogTrigger>
