@@ -46,7 +46,6 @@ export default function Footer() {
             <Link href="/rules" className="text-muted-foreground hover:text-accent transition-colors">Rules</Link>
             <Link href="/status" className="text-muted-foreground hover:text-accent transition-colors">Player Status</Link>
             <Link href="/feedback" className="text-muted-foreground hover:text-accent transition-colors">Feedback</Link>
-            <Link href="/server-admin" className="text-muted-foreground hover:text-accent transition-colors">Admin</Link>
             <Link href="/#join" className="text-muted-foreground hover:text-accent transition-colors">Join</Link>
           </nav>
           <div className="flex items-center space-x-4 justify-center md:justify-end">

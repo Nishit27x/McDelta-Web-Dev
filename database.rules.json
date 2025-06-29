@@ -1,13 +1,5 @@
 {
   "rules": {
-    "reviewsBySessionId": {
-      ".read": true,
-      ".write": false
-    },
-    "usersBySessionId": {
-        ".read": false,
-        ".write": false
-    },
     "galleryImages": {
       ".read": true,
       ".write": false
