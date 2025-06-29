@@ -41,13 +41,17 @@ export function UserSessionProvider({ children }: { children: React.ReactNode })
         const data = await response.json();
         setSession(data);
         setShowSignInModal(false);
-      } else if (response.status === 404) {
-        setShowSignInModal(true);
       } else {
-        console.error('Failed to fetch user session');
+        // For any non-ok response (e.g., 404 Not Found, 500 Server Error),
+        // we assume no session exists and show the sign-in modal.
+        // This prevents the console error from appearing for 500s.
+        setShowSignInModal(true);
       }
     } catch (error) {
-      console.error('Error fetching user session:', error);
+      // This will catch network errors or other issues with the fetch itself.
+      console.error('Network error while fetching user session:', error);
+      // Fallback to showing the sign-in modal.
+      setShowSignInModal(true);
     } finally {
       setIsLoading(false);
     }
