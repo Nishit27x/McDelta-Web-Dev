@@ -1,7 +1,9 @@
 import Header from '@/components/header';
 import Footer from '@/components/landing/footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Construction } from 'lucide-react';
+import { Construction, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function FeedbackPage() {
   return (
@@ -18,7 +20,7 @@ export default function FeedbackPage() {
               Our new feedback system is currently under construction. Please check back soon!
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-col items-center gap-4">
             <p className="text-sm text-muted-foreground">
               In the meantime, feel free to share your thoughts on our{' '}
               <a href="https://discord.gg/kSE8qCUY" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
@@ -26,6 +28,12 @@ export default function FeedbackPage() {
               </a>
               .
             </p>
+            <Button asChild>
+              <Link href="/">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Home
+              </Link>
+            </Button>
           </CardContent>
         </Card>
       </main>
