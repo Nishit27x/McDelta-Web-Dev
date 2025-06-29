@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Header from '@/components/header';
@@ -11,11 +11,12 @@ import Footer from '@/components/landing/footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ArrowLeft, ShieldCheck, Upload, Edit, Trash2, ShieldAlert, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { ArrowLeft, Upload, Edit, Trash2, ShieldAlert, Loader2, LogIn } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useUserSession, AuthWrapper } from '@/contexts/user-session-context';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import SignInModal from '@/components/sign-in-modal';
 
 
 const imageUploadSchema = z.object({
@@ -130,8 +131,46 @@ function ImageUploadForm() {
 }
 
 function AdminDashboard() {
-  const { profile } = useUserSession();
+  const { user, profile } = useUserSession();
+  const [showSignInModal, setShowSignInModal] = useState(false);
 
+  // Case 1: User is not logged in at all.
+  if (!user) {
+    return (
+      <main className="flex-grow container mx-auto px-4 py-16 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit">
+              <LogIn className="h-10 w-10 text-primary" />
+            </div>
+            <CardTitle className="mt-4">Admin Sign In</CardTitle>
+            <CardDescription>
+              Please sign in with your admin gamertag to access this page.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <Button onClick={() => setShowSignInModal(true)} className="w-full">
+              Sign In
+            </Button>
+            <Button variant="outline" asChild className="w-full">
+              <Link href="/">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Home
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+        {showSignInModal && (
+          <SignInModal
+            onSuccess={() => setShowSignInModal(false)}
+            onCancel={() => setShowSignInModal(false)}
+          />
+        )}
+      </main>
+    );
+  }
+
+  // Case 2: User is logged in, but their profile doesn't have admin rights.
   if (!profile?.isAdmin) {
     return (
       <main className="flex-grow container mx-auto px-4 py-16 flex items-center justify-center">
@@ -159,6 +198,7 @@ function AdminDashboard() {
     );
   }
 
+  // Case 3: User is an admin. Show the dashboard.
   return (
     <main className="flex-grow container mx-auto px-4 py-16">
       <div className="text-center mb-12">
