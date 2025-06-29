@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/accordion";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BookOpenCheck, ShieldCheck } from 'lucide-react';
+import Image from 'next/image';
 
 const deltanRules = [
   {
@@ -144,7 +145,14 @@ export default function RulesPage() {
       <Header />
       <main className="flex-grow container mx-auto px-4 py-16 md:py-24">
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-jokerman tracking-wider">McDelta SMP Rules</h1>
+          <Image
+            src="/images/916d7d6f-21f4-4114-ae9e-e81804862f9f.png"
+            alt="McDelta SMP Rules Banner"
+            width={1000}
+            height={563}
+            className="mx-auto rounded-xl shadow-2xl mb-8"
+            priority
+          />
           <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
             To foster community growth and reward initiative, these guidelines govern our server. Please read them carefully.
           </p>
