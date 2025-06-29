@@ -1,5 +1,9 @@
 {
   "rules": {
+    "reviews": {
+      ".read": true,
+      ".write": false
+    },
     "galleryImages": {
       ".read": true,
       ".write": false

@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import admin from '@/lib/firebase-admin';
 import * as z from 'zod';
-import { cookies } from 'next/headers';
 
 const feedbackSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters.").max(50),
@@ -9,22 +8,30 @@ const feedbackSchema = z.object({
   rating: z.number().min(1).max(5),
 });
 
+// Check if Firebase Admin is initialized
+function isFirebaseAdminInitialized() {
+  return admin.apps.length > 0;
+}
+
 export async function GET() {
+  if (!isFirebaseAdminInitialized()) {
+    // Return empty array if Firebase is not configured, so the page doesn't break.
+    // The form will show an error on POST if they try to submit.
+    return NextResponse.json([], { status: 200 });
+  }
+
   try {
-    if (!admin.apps.length) {
-      return NextResponse.json({ error: 'Server configuration error: Firebase Admin SDK not initialized.' }, { status: 500 });
-    }
     const db = admin.database();
-    const ref = db.ref('reviewsBySessionId');
-    const snapshot = await ref.once('value');
+    const ref = db.ref('reviews');
+    const snapshot = await ref.orderByChild('createdAt').limitToLast(50).once('value');
 
     if (snapshot.exists()) {
       const data = snapshot.val();
-      // Transform the object of reviews into an array
+      // Transform the object of reviews into an array and sort descending
       const reviews = Object.keys(data).map(key => ({
         id: key,
         ...data[key],
-      })).sort((a, b) => b.lastEditedAt - a.lastEditedAt); // Sort by most recent
+      })).sort((a, b) => b.createdAt - a.createdAt);
       return NextResponse.json(reviews, { status: 200 });
     }
 
@@ -36,14 +43,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const cookieStore = cookies();
-  const sessionId = cookieStore.get('sessionId')?.value;
-
-  if (!sessionId) {
-    return NextResponse.json({ error: 'You must be signed in to leave feedback.' }, { status: 401 });
+  if (!isFirebaseAdminInitialized()) {
+    return NextResponse.json({ error: 'Server configuration error: The feedback system is currently unavailable.' }, { status: 500 });
   }
-
-  const userAgent = request.headers.get('user-agent') || 'unknown';
 
   let body;
   try {
@@ -62,50 +64,25 @@ export async function POST(request: NextRequest) {
   const { name, message, rating } = validation.data;
 
   try {
-    if (!admin.apps.length) {
-      return NextResponse.json({ error: 'Server configuration error: Firebase Admin SDK not initialized.' }, { status: 500 });
-    }
     const db = admin.database();
+    const ref = db.ref('reviews');
     
-    // Fetch user session to get avatar
-    const userRef = db.ref(`usersBySessionId/${sessionId}`);
-    const userSnapshot = await userRef.once('value');
-    if (!userSnapshot.exists()) {
-      return NextResponse.json({ error: 'No user session found. Cannot submit feedback.' }, { status: 403 });
-    }
-    const userData = userSnapshot.val();
-    const avatar = userData.avatar;
-    
-    // Now handle the review
-    const ref = db.ref(`reviewsBySessionId/${sessionId}`);
-    const now = Date.now();
+    // We'll use the gamertag to try and fetch an avatar from Crafatar
+    // This is not guaranteed to be a real player UUID, but Crafatar has fallbacks.
+    const newReview = {
+        name,
+        message,
+        rating,
+        avatar: `https://crafatar.com/avatars/${name}?overlay`,
+        createdAt: Date.now(),
+        userAgent: request.headers.get('user-agent') || 'unknown',
+    };
 
-    const snapshot = await ref.once('value');
+    const newReviewRef = await ref.push(newReview);
+    const createdReview = { ...newReview, id: newReviewRef.key };
     
-    if (snapshot.exists()) {
-      // Review exists, update it
-      await ref.update({
-        name,
-        message,
-        rating,
-        avatar,
-        lastEditedAt: now,
-        userAgent, // Optionally update user agent on edit
-      });
-       return NextResponse.json({ message: 'Feedback updated successfully.' }, { status: 200 });
-    } else {
-      // New review, create it
-      await ref.set({
-        name,
-        message,
-        rating,
-        avatar,
-        userAgent,
-        createdAt: now,
-        lastEditedAt: now,
-      });
-      return NextResponse.json({ message: 'Feedback submitted successfully.' }, { status: 201 });
-    }
+    return NextResponse.json({ message: 'Feedback submitted successfully!', review: createdReview }, { status: 201 });
+
   } catch (error) {
     console.error('Error submitting feedback:', error);
     return NextResponse.json({ error: 'Failed to submit feedback.' }, { status: 500 });
