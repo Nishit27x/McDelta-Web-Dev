@@ -16,6 +16,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { auth } from '@/lib/firebase-client';
+import { signInWithCustomToken } from 'firebase/auth';
 
 
 // --- Backend-Connected Image Upload Form ---
@@ -211,6 +213,8 @@ function AdminAuthFlow() {
   const [pattern, setPattern] = useState<number[]>([]);
   const [patternKey, setPatternKey] = useState(() => Date.now());
   const [error, setError] = useState('');
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const { toast } = useToast();
 
   const correctPattern = [2, 5, 8];
 
@@ -227,23 +231,65 @@ function AdminAuthFlow() {
     setPatternKey(Date.now());
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsAuthenticating(true);
 
     const isUsernameCorrect = username === 'ADMINDELTA';
     const isPasswordCorrect = password === 'delta@admin';
     const isPatternCorrect = JSON.stringify(pattern) === JSON.stringify(correctPattern);
 
     if (isUsernameCorrect && isPasswordCorrect && isPatternCorrect) {
-      setIsAuthenticated(true);
+      // Credentials are correct, now attempt to create a secure session
+      try {
+        if (!auth) {
+            throw new Error('Firebase is not configured. Cannot create a secure session.');
+        }
+
+        const adminGamertag = 'ADMINDELTA';
+        
+        // Step 1: Get custom token for the admin user
+        const loginResponse = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ gamertag: adminGamertag }),
+        });
+        const loginData = await loginResponse.json();
+        if (!loginResponse.ok) throw new Error(loginData.error || `Failed to start session for ${adminGamertag}.`);
+
+        // Step 2: Sign in with the custom token on the client
+        const userCredential = await signInWithCustomToken(auth, loginData.customToken);
+        const idToken = await userCredential.user.getIdToken();
+
+        // Step 3: Send the ID token to the server to create a session cookie
+        const sessionResponse = await fetch('/api/auth/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken })
+        });
+        const sessionData = await sessionResponse.json();
+        if (!sessionResponse.ok) throw new Error(sessionData.error || 'Failed to create a session cookie.');
+
+        // All successful, grant access
+        setIsAuthenticated(true);
+        toast({ title: 'Admin session started successfully!' });
+
+      } catch (err) {
+        const errorMessage = (err as Error).message;
+        setError(`Session Error: ${errorMessage}. Ensure 'ADMINDELTA' is in your ADMIN_GAMERTAGS variable.`);
+        handleResetPattern();
+      } finally {
+        setIsAuthenticating(false);
+      }
     } else {
-        let errorMsg = 'Invalid credentials. ';
-        if (!isUsernameCorrect) errorMsg += 'Check username. ';
-        if (!isPasswordCorrect) errorMsg += 'Check password. ';
-        if (!isPatternCorrect) errorMsg += 'Check pattern. ';
+      let errorMsg = 'Invalid credentials. ';
+      if (!isUsernameCorrect) errorMsg += 'Check username. ';
+      if (!isPasswordCorrect) errorMsg += 'Check password. ';
+      if (!isPatternCorrect) errorMsg += 'Check pattern. ';
       setError(errorMsg.trim());
       handleResetPattern();
+      setIsAuthenticating(false);
     }
   };
 
@@ -320,7 +366,10 @@ function AdminAuthFlow() {
                     </Link>
                 </Button>
             ) : (
-                <Button type="submit" className="w-full"><LogIn className="mr-2 h-4 w-4" />Authenticate</Button>
+                <Button type="submit" className="w-full" disabled={isAuthenticating}>
+                  {isAuthenticating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
+                  {isAuthenticating ? 'Authenticating...' : 'Authenticate'}
+                </Button>
             )}
           </form>
         </CardContent>
