@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface GalleryImage {
@@ -37,6 +37,8 @@ export default function Gallery() {
     };
     fetchImages();
   }, []);
+
+  const selectedImageData = images.find((img) => img.src === selectedImage);
 
   return (
     <section id="gallery" className="py-16 md:py-24 bg-card text-card-foreground">
@@ -84,10 +86,14 @@ export default function Gallery() {
       </div>
       <Dialog open={!!selectedImage} onOpenChange={(isOpen) => !isOpen && setSelectedImage(null)}>
         <DialogContent className="max-w-4xl p-1 border-0 bg-background rounded-xl">
+          <DialogTitle className="sr-only">Enlarged gallery image</DialogTitle>
+          <DialogDescription className="sr-only">
+            {selectedImageData ? selectedImageData.alt : 'An enlarged view of a gallery image.'}
+          </DialogDescription>
           {selectedImage && (
             <Image
               src={selectedImage}
-              alt="Enlarged gallery view"
+              alt={selectedImageData?.alt || 'Enlarged gallery view'}
               width={1600}
               height={900}
               className="w-full h-auto rounded-lg shadow-2xl"
