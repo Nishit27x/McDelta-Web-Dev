@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "./ui/sheet";
 import { Menu } from "lucide-react";
 
 const DiamondIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -50,6 +50,9 @@ export default function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
+              <SheetHeader className="sr-only">
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
               <nav className="grid gap-6 text-lg font-medium pt-10">
                 <div className="flex items-center gap-2 text-lg font-semibold mb-4">
                   <DiamondIcon className="h-6 w-6 text-accent" />
