@@ -19,6 +19,7 @@ export default function About() {
               src="/__fshost__/user-images/1"
               alt="McDelta SMP promotional image featuring a character in a Minecraft world"
               fill
+              unoptimized
               className="object-cover transition-transform duration-300 group-hover:scale-110"
             />
           </div>
