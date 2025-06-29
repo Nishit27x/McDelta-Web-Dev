@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
-import { Menu, Coffee } from "lucide-react";
+import { Menu } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,25 +47,6 @@ export default function Header() {
           <Link href="/#feedback" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Feedback</Link>
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-2">
-           <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" className="hidden lg:inline-flex">
-                <Coffee className="h-4 w-4 mr-2" />
-                Buy us a Coffee!
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Coming Soon!</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Coming Soon, Keep Supporting!
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogAction>Got it</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
           <Button asChild>
             <Link href="/#join">Join Now</Link>
           </Button>
@@ -89,23 +70,6 @@ export default function Header() {
                 <Link href="/#player-status" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Player Status</Link>
                 <Link href="/#feedback" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Feedback</Link>
                 <Link href="/#join" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Join</Link>
-                <AlertDialog>
-                  <AlertDialogTrigger className="flex items-center text-muted-foreground hover:text-foreground text-left w-full">
-                    <Coffee className="h-5 w-5 mr-2" />
-                    <span>Buy us a Coffee!</span>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Coming Soon!</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Coming Soon, Keep Supporting!
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogAction>Got it</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
               </nav>
             </SheetContent>
           </Sheet>

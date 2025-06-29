@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
+import BuyMeACoffeeButton from '@/components/buy-me-a-coffee-button';
 
 export const metadata: Metadata = {
   title: 'McDelta SMP',
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body className={cn('font-body antialiased')}>
         {children}
         <Toaster />
+        <BuyMeACoffeeButton />
       </body>
     </html>
   );
