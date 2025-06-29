@@ -1,10 +1,10 @@
 {
   "rules": {
-    "reviewsByIP": {
+    "reviewsBySessionId": {
       ".read": true,
       ".write": false
     },
-    "usersByIP": {
+    "usersBySessionId": {
         ".read": false,
         ".write": false
     },

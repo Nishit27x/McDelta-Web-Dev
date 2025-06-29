@@ -4,6 +4,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import admin from '@/lib/firebase-admin';
 import * as z from 'zod';
 import { randomUUID } from 'crypto';
+import { cookies } from 'next/headers';
 
 const gamertagSchema = z.object({
   gamertag: z.string().min(3).max(20),
@@ -14,19 +15,16 @@ const getAdminGamertags = () => {
 }
 
 export async function GET(request: NextRequest) {
-  let ip = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim();
-  if (!ip) {
-    if (process.env.NODE_ENV === 'development') {
-      ip = '127.0.0.1'; // Use a mock IP for dev
-    } else {
-      return NextResponse.json({ error: 'Could not identify IP address.' }, { status: 400 });
-    }
+  const cookieStore = cookies();
+  const sessionId = cookieStore.get('sessionId')?.value;
+
+  if (!sessionId) {
+    return NextResponse.json({ error: 'No session found.' }, { status: 404 });
   }
-  const sanitizedIp = ip.replace(/\./g, '_').replace(/:/g, '_');
 
   try {
     const db = admin.database();
-    const ref = db.ref(`usersByIP/${sanitizedIp}`);
+    const ref = db.ref(`usersBySessionId/${sessionId}`);
     const snapshot = await ref.once('value');
 
     if (snapshot.exists()) {
@@ -42,7 +40,9 @@ export async function GET(request: NextRequest) {
       await ref.update({ lastSeen: new Date().toISOString() });
       return NextResponse.json(responseData, { status: 200 });
     } else {
-      return NextResponse.json({ error: 'User not found.' }, { status: 404 });
+      // Session ID in cookie is invalid, maybe DB was cleared. Delete it.
+      cookieStore.delete('sessionId');
+      return NextResponse.json({ error: 'User session not found.' }, { status: 404 });
     }
   } catch (error) {
     console.error('Error fetching user session:', error);
@@ -50,17 +50,10 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
-  let ip = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim();
-  if (!ip) {
-      if (process.env.NODE_ENV === 'development') {
-        ip = '127.0.0.1'; // Use a mock IP for dev
-      } else {
-        return NextResponse.json({ error: 'Could not identify IP address.' }, { status: 400 });
-      }
-  }
-  const sanitizedIp = ip.replace(/\./g, '_').replace(/:/g, '_');
 
+export async function POST(request: NextRequest) {
+  const cookieStore = cookies();
+  let sessionId = cookieStore.get('sessionId')?.value;
 
   let body;
   try {
@@ -80,33 +73,44 @@ export async function POST(request: NextRequest) {
 
   try {
     const db = admin.database();
-    const ref = db.ref(`usersByIP/${sanitizedIp}`);
-    const snapshot = await ref.once('value');
-    
     const now = new Date().toISOString();
     let userData;
     let statusCode = 200;
 
-    if (snapshot.exists()) {
-      // User exists, update gamertag and lastSeen
-      const existingData = snapshot.val();
-      const updatedData = {
-        gamertag: gamertag,
-        lastSeen: now,
-      };
-      await ref.update(updatedData);
-      userData = { ...existingData, ...updatedData };
-    } else {
-      // New user, create it
-      const userId = randomUUID();
+    let sessionExistsInDb = false;
+    if (sessionId) {
+        const ref = db.ref(`usersBySessionId/${sessionId}`);
+        const snapshot = await ref.once('value');
+        if (snapshot.exists()) {
+            sessionExistsInDb = true;
+            const existingData = snapshot.val();
+            const updatedData = {
+                gamertag: gamertag,
+                lastSeen: now,
+            };
+            await ref.update(updatedData);
+            userData = { ...existingData, ...updatedData };
+        }
+    }
+
+    if (!sessionExistsInDb) {
+      // New user or invalid session, create a new one
+      const newSessionId = randomUUID();
+      const crafatarId = randomUUID();
       userData = {
         gamertag,
-        avatar: `https://crafatar.com/avatars/${userId}?overlay`,
-        ip: ip,
+        avatar: `https://crafatar.com/avatars/${crafatarId}?overlay`,
         createdAt: now,
         lastSeen: now,
       };
-      await ref.set(userData);
+      await db.ref(`usersBySessionId/${newSessionId}`).set(userData);
+      
+      cookieStore.set('sessionId', newSessionId, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== 'development',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 365, // 1 year
+      });
       statusCode = 201;
     }
     

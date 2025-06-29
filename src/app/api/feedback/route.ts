@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import admin from '@/lib/firebase-admin';
 import * as z from 'zod';
+import { cookies } from 'next/headers';
 
 const feedbackSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters.").max(50),
@@ -11,7 +12,7 @@ const feedbackSchema = z.object({
 export async function GET() {
   try {
     const db = admin.database();
-    const ref = db.ref('reviewsByIP');
+    const ref = db.ref('reviewsBySessionId');
     const snapshot = await ref.once('value');
 
     if (snapshot.exists()) {
@@ -32,16 +33,13 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  let ip = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim();
-  if (!ip) {
-    if (process.env.NODE_ENV === 'development') {
-      ip = '127.0.0.1'; // Use a mock IP for dev
-    } else {
-      return NextResponse.json({ error: 'Could not identify IP address.' }, { status: 400 });
-    }
+  const cookieStore = cookies();
+  const sessionId = cookieStore.get('sessionId')?.value;
+
+  if (!sessionId) {
+    return NextResponse.json({ error: 'You must be signed in to leave feedback.' }, { status: 401 });
   }
-  const sanitizedIp = ip.replace(/\./g, '_').replace(/:/g, '_');
-  
+
   const userAgent = request.headers.get('user-agent') || 'unknown';
 
   let body;
@@ -62,16 +60,16 @@ export async function POST(request: NextRequest) {
     const db = admin.database();
     
     // Fetch user session to get avatar
-    const userRef = db.ref(`usersByIP/${sanitizedIp}`);
+    const userRef = db.ref(`usersBySessionId/${sessionId}`);
     const userSnapshot = await userRef.once('value');
     if (!userSnapshot.exists()) {
-      return NextResponse.json({ error: 'No user session found for this IP. Cannot submit feedback.' }, { status: 403 });
+      return NextResponse.json({ error: 'No user session found. Cannot submit feedback.' }, { status: 403 });
     }
     const userData = userSnapshot.val();
     const avatar = userData.avatar;
     
     // Now handle the review
-    const ref = db.ref(`reviewsByIP/${sanitizedIp}`);
+    const ref = db.ref(`reviewsBySessionId/${sessionId}`);
     const now = Date.now();
 
     const snapshot = await ref.once('value');
@@ -94,7 +92,6 @@ export async function POST(request: NextRequest) {
         message,
         rating,
         avatar,
-        ip: ip, // Store original IP for reference
         userAgent,
         createdAt: now,
         lastEditedAt: now,
