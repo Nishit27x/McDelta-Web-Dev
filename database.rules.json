@@ -7,6 +7,10 @@
     "usersByIP": {
         ".read": false,
         ".write": false
+    },
+    "galleryImages": {
+      ".read": true,
+      ".write": false
     }
   }
 }
