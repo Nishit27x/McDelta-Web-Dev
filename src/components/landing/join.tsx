@@ -3,12 +3,46 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, Users, Signal } from "lucide-react";
+import { Copy, Users, Signal, ServerOff } from "lucide-react";
 import DiscordIcon from "../icons/discord-icon";
+import { useEffect, useState } from "react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+interface ServerStatus {
+  online: number;
+  max: number;
+  players: string[];
+  error?: string;
+}
 
 export default function Join() {
   const { toast } = useToast();
-  const serverIp = 'play.mcdelta.smp';
+  const serverIp = 'paid-1.guardxhosting.in:25501';
+
+  const [status, setStatus] = useState<ServerStatus | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch('/api/mc-status');
+        const data = await res.json();
+         if (!res.ok) {
+          throw new Error(data.error || 'Server response was not ok');
+        }
+        setStatus(data);
+      } catch (error) {
+        console.error("Failed to fetch server status:", error);
+        setStatus({ online: 0, max: 0, players: [], error: "Could not retrieve server status." });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 60000); // Refresh every 60 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(serverIp);
@@ -29,12 +63,12 @@ export default function Join() {
           <Card className="bg-background/50 shadow-inner-lg">
             <CardContent className="p-4 flex items-center gap-4">
               <span className="font-mono text-lg tracking-widest">{serverIp}</span>
-              <Button variant="ghost" size="icon" onClick={copyToClipboard} aria-label="Copy server IP">
+              <Button variant="ghost" size="icon" onClick={copyToClipboard} aria-label="Copy server IP" suppressHydrationWarning>
                 <Copy className="w-5 h-5" />
               </Button>
             </CardContent>
           </Card>
-          <Button asChild size="lg" className="bg-[#5865F2] hover:bg-[#5865F2]/90 text-white">
+          <Button asChild size="lg" className="bg-[#5865F2] hover:bg-[#5865F2]/90 text-white" suppressHydrationWarning>
             <a href="https://discord.gg/kSE8qCUY" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
               <DiscordIcon className="w-6 h-6" />
               Join our Discord
@@ -42,21 +76,46 @@ export default function Join() {
           </Button>
         </div>
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-md mx-auto">
-            <Card>
-                <CardContent className="p-4 flex items-center gap-4">
-                    <Users className="w-8 h-8 text-primary" />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Card className="cursor-help">
+                      <CardContent className="p-4 flex items-center gap-4">
+                          <Users className="w-8 h-8 text-primary" />
+                          <div>
+                              <p className="font-bold text-2xl">
+                                {loading ? '...' : `${status?.online ?? 0} / ${status?.max ?? 0}`}
+                              </p>
+                              <p className="text-sm text-muted-foreground">Players Online</p>
+                          </div>
+                      </CardContent>
+                  </Card>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {loading ? (
+                    <p>Loading players...</p>
+                  ) : (status?.players && status.players.length > 0) ? (
                     <div>
-                        <p className="font-bold text-2xl">69 / 100</p>
-                        <p className="text-sm text-muted-foreground">Players Online</p>
+                      <p className="font-bold mb-2">Players:</p>
+                      <ul className="list-disc list-inside">
+                        {status.players.map(p => <li key={p}>{p}</li>)}
+                      </ul>
                     </div>
-                </CardContent>
-            </Card>
+                  ) : (
+                    <p>No players online.</p>
+                  )}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
             <Card>
                 <CardContent className="p-4 flex items-center gap-4">
-                    <Signal className="w-8 h-8 text-primary" />
+                    {loading || !status?.error ? <Signal className="w-8 h-8 text-primary" /> : <ServerOff className="w-8 h-8 text-destructive" />}
                     <div>
-                        <p className="font-bold text-2xl">99.9%</p>
-                        <p className="text-sm text-muted-foreground">Server Uptime</p>
+                        <p className="font-bold text-2xl">
+                          {loading ? 'Pinging...' : status?.error ? <span className="text-destructive">Offline</span> : <span className="text-primary">Online</span>}
+                        </p>
+                        <p className="text-sm text-muted-foreground">Server Status</p>
                     </div>
                 </CardContent>
             </Card>
