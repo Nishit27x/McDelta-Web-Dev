@@ -42,6 +42,14 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  // Check for Firebase config first. If it's missing, fail early with a clear error.
+  if (!isFirebaseAdminInitialized()) {
+    return NextResponse.json(
+        { error: 'Server configuration error: The feedback system is currently unavailable.' },
+        { status: 503 }
+    );
+  }
+
   let body;
   try {
     body = await request.json();
@@ -58,24 +66,7 @@ export async function POST(request: NextRequest) {
   
   const { name, message, rating } = validation.data;
 
-  // If Firebase isn't configured, we'll simulate a successful submission for development purposes.
-  if (!isFirebaseAdminInitialized()) {
-    console.warn("Firebase Admin not configured. Simulating feedback submission.");
-    const mockReview = {
-        id: new Date().toISOString(),
-        name,
-        message,
-        rating,
-        avatar: `https://crafatar.com/avatars/${name}?overlay`,
-        createdAt: Date.now(),
-    };
-    return NextResponse.json({ 
-        message: 'Feedback submitted successfully! (This is a demo, data was not saved)', 
-        review: mockReview 
-    }, { status: 201 });
-  }
-
-  // If Firebase IS configured, proceed to save the data to the database.
+  // Proceed to save the data to the database.
   try {
     const db = admin.database();
     const ref = db.ref('reviews');
