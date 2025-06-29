@@ -4,6 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
+import * as React from 'react';
 
 export default function Hero() {
   const images = [
@@ -12,13 +14,19 @@ export default function Hero() {
     { src: 'https://placehold.co/1920x1082.png', alt: 'Minecraft custom build', hint: 'minecraft castle' },
   ];
 
+  const plugin = React.useRef(
+    Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true })
+  );
+
   return (
     <section className="relative h-[80vh] w-full flex items-center justify-center text-center">
       <Carousel
+        plugins={[plugin.current]}
         className="absolute inset-0 w-full h-full overflow-hidden"
         opts={{
           loop: true,
         }}
+        onMouseLeave={plugin.current.reset}
       >
         <CarouselContent>
           {images.map((image, index) => (
