@@ -70,25 +70,36 @@ export async function POST(request: NextRequest) {
     const ref = db.ref(`usersByIP/${sanitizedIp}`);
     const snapshot = await ref.once('value');
     
+    const now = new Date().toISOString();
+    let userData;
+    let statusCode = 200;
+
     if (snapshot.exists()) {
-      return NextResponse.json({ error: 'A user is already registered for this IP address.' }, { status: 409 });
+      // User exists, update gamertag and lastSeen
+      const existingData = snapshot.val();
+      const updatedData = {
+        gamertag: gamertag,
+        lastSeen: now,
+      };
+      await ref.update(updatedData);
+      userData = { ...existingData, ...updatedData };
+    } else {
+      // New user, create it
+      const userId = randomUUID();
+      userData = {
+        gamertag,
+        avatar: `https://crafatar.com/avatars/${userId}?overlay`,
+        ip: ip,
+        createdAt: now,
+        lastSeen: now,
+      };
+      await ref.set(userData);
+      statusCode = 201;
     }
     
-    const now = new Date().toISOString();
-    const userId = randomUUID();
-    const newUser = {
-      gamertag,
-      avatar: `https://crafatar.com/avatars/${userId}?overlay`,
-      ip: ip,
-      createdAt: now,
-      lastSeen: now,
-    };
-
-    await ref.set(newUser);
-    
-    return NextResponse.json(newUser, { status: 201 });
+    return NextResponse.json(userData, { status: statusCode });
   } catch (error) {
-    console.error('Error creating user session:', error);
-    return NextResponse.json({ error: 'Failed to create user session.' }, { status: 500 });
+    console.error('Error creating or updating user session:', error);
+    return NextResponse.json({ error: 'Failed to save user session.' }, { status: 500 });
   }
 }
