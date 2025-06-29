@@ -49,10 +49,10 @@ export default function Join() {
   }, []);
 
   const copyIpToClipboard = () => {
-    navigator.clipboard.writeText(`${ipAddress}:${port}`);
+    navigator.clipboard.writeText(ipAddress);
     toast({
       title: "Copied to clipboard!",
-      description: `Server IP: ${ipAddress}:${port}`,
+      description: `Server IP: ${ipAddress}`,
     });
   };
 
