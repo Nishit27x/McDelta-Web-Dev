@@ -1,16 +1,16 @@
-import { query } from 'minecraft-server-util';
+import { status } from 'minecraft-server-util';
 import { NextResponse } from 'next/server';
 
 export const revalidate = 60; // Revalidate every 60 seconds
 
 const serverConfig = {
   host: 'paid-1.guardxhosting.in',
-  port: 25565, // Query port
+  port: 25501, // Game port for status ping
 };
 
 export async function GET() {
   try {
-    const response = await query(serverConfig.host, serverConfig.port, {
+    const response = await status(serverConfig.host, serverConfig.port, {
       timeout: 5000,
       enableSRV: false,
     });
@@ -18,7 +18,7 @@ export async function GET() {
     const data = {
       online: response.players.online,
       max: response.players.max,
-      players: response.players.list,
+      players: response.players.sample ? response.players.sample.map(p => p.name) : [],
     };
 
     return NextResponse.json(data);
