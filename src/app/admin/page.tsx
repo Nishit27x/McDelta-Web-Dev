@@ -212,7 +212,7 @@ function AdminAuthFlow() {
   const [patternKey, setPatternKey] = useState(() => Date.now());
   const [error, setError] = useState('');
 
-  const correctPattern = [0, 2, 8, 6];
+  const correctPattern = [2, 5, 8];
 
   const handlePatternComplete = (completedPath: number[]) => {
     setPattern(completedPath);
