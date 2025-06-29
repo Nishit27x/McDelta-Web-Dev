@@ -236,6 +236,14 @@ function AdminAuthFlow() {
     setError('');
     setIsAuthenticating(true);
 
+    // Add a specific check for Firebase client configuration at the very beginning.
+    if (!auth) {
+      setError("Session Error: Client-side Firebase credentials are not configured in .env.local. Cannot create a secure session.");
+      setIsAuthenticating(false);
+      handleResetPattern();
+      return;
+    }
+
     const isUsernameCorrect = username === 'ADMINDELTA';
     const isPasswordCorrect = password === 'delta@admin';
     const isPatternCorrect = JSON.stringify(pattern) === JSON.stringify(correctPattern);
@@ -243,10 +251,6 @@ function AdminAuthFlow() {
     if (isUsernameCorrect && isPasswordCorrect && isPatternCorrect) {
       // Credentials are correct, now attempt to create a secure session
       try {
-        if (!auth) {
-            throw new Error('Firebase is not configured. Cannot create a secure session.');
-        }
-
         const adminGamertag = 'ADMINDELTA';
         
         // Step 1: Get custom token for the admin user
@@ -277,7 +281,7 @@ function AdminAuthFlow() {
 
       } catch (err) {
         const errorMessage = (err as Error).message;
-        setError(`Session Error: ${errorMessage}. Ensure 'ADMINDELTA' is in your ADMIN_GAMERTAGS variable.`);
+        setError(`Session Error: ${errorMessage}. Make sure the 'ADMINDELTA' user is listed in your ADMIN_GAMERTAGS variable.`);
         handleResetPattern();
       } finally {
         setIsAuthenticating(false);
