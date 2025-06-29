@@ -3,7 +3,7 @@ import { HeartPulse, Swords, ScrollText, Blocks, MessageCircle, Star } from 'luc
 
 const features = [
   {
-    icon: <HeartPulse className="w-8 h-8 text-primary" />,
+    icon: <HeartPulse className="w-8 h-8 text-destructive" />,
     title: 'Lifesteal Mechanics',
     description: 'Eliminate other players to steal their hearts. But be careful, you can lose hearts too!',
   },
