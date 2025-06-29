@@ -5,13 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search } from 'lucide-react';
 
-// Mock data for all players who have ever joined.
-// In a real application, you would fetch this from a database.
-const allTimePlayers = [
-    'Steve', 'Alex', 'NoobSlayer69', 'CreeperLover', 'DiamondMiner_42', 
-    'Herobrine', 'Notch', 'Jeb_', 'Dinnerbone', 'Grumm'
-];
-
 interface ServerStatus {
   online: number;
   max: number;
@@ -30,7 +23,9 @@ export default function PlayerStatus() {
         const res = await fetch('/api/mc-status');
         const data: ServerStatus = await res.json();
         if (data && data.players) {
-          setOnlinePlayers(data.players);
+          setOnlinePlayers(data.players.sort((a, b) => a.localeCompare(b)));
+        } else {
+          setOnlinePlayers([]);
         }
       } catch (error) {
         console.error("Failed to fetch server status:", error);
@@ -45,18 +40,15 @@ export default function PlayerStatus() {
     return () => clearInterval(interval);
   }, []);
 
-  const uniquePlayers = useMemo(() => {
-    // Combine all-time players with currently online players and remove duplicates.
-    const allPlayers = [...new Set([...allTimePlayers, ...onlinePlayers])];
-    return allPlayers.sort((a, b) => a.localeCompare(b));
-  }, [onlinePlayers]);
-
 
   const filteredPlayers = useMemo(() => {
-    return uniquePlayers.filter((player) =>
+    if (!searchTerm) {
+      return onlinePlayers;
+    }
+    return onlinePlayers.filter((player) =>
       player.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [uniquePlayers, searchTerm]);
+  }, [onlinePlayers, searchTerm]);
 
   return (
     <section id="player-status" className="py-16 md:py-24 bg-background/50">
@@ -71,7 +63,7 @@ export default function PlayerStatus() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Search className="w-6 h-6" />
-              <span>Search Players</span>
+              <span>Search Online Players</span>
             </CardTitle>
             <div className="relative mt-4">
               <Input
@@ -92,16 +84,16 @@ export default function PlayerStatus() {
                 {filteredPlayers.length > 0 ? (
                     <ul className="space-y-3">
                     {filteredPlayers.map((player) => {
-                        const isOnline = onlinePlayers.includes(player);
+                        // All players in this list are online
                         return (
                         <li key={player} className="flex items-center justify-between p-3 rounded-md bg-background/50">
                             <span className="font-medium">{player}</span>
                             <div className="flex items-center gap-2">
                             <span
-                                className={`h-3 w-3 rounded-full ${isOnline ? 'bg-online' : 'bg-muted-foreground/50'}`}
+                                className={`h-3 w-3 rounded-full bg-online`}
                             ></span>
-                            <span className={`text-sm font-semibold ${isOnline ? 'text-online' : 'text-muted-foreground'}`}>
-                                {isOnline ? 'Online' : 'Offline'}
+                            <span className={`text-sm font-semibold text-online`}>
+                                Online
                             </span>
                             </div>
                         </li>
@@ -109,11 +101,15 @@ export default function PlayerStatus() {
                     })}
                     </ul>
                 ) : (
+                  onlinePlayers.length === 0 && !searchTerm ? (
+                    <p className="text-center text-muted-foreground py-8">No players are currently online.</p>
+                  ) : (
                     <p className="text-center text-muted-foreground py-8">No players found matching your search.</p>
+                  )
                 )}
                 </div>
             )}
-            <p className="text-xs text-muted-foreground mt-4 text-center">* Player list includes mock data. A database is needed for a full player history.</p>
+            <p className="text-xs text-muted-foreground mt-4 text-center">* Only currently online players are shown.</p>
           </CardContent>
         </Card>
       </div>

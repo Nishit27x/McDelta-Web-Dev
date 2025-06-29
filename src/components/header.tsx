@@ -49,7 +49,7 @@ export default function Header() {
         <div className="flex flex-1 items-center justify-end space-x-2">
            <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" className="hidden lg:inline-flex">
                 <Coffee className="h-4 w-4 mr-2" />
                 Buy us a Coffee!
               </Button>
