@@ -7,6 +7,7 @@ import { Copy, Users, Signal, ServerOff } from "lucide-react";
 import DiscordIcon from "../icons/discord-icon";
 import { useEffect, useState } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import Link from "next/link";
 
 interface ServerStatus {
   online: number;
@@ -48,10 +49,10 @@ export default function Join() {
   }, []);
 
   const copyIpToClipboard = () => {
-    navigator.clipboard.writeText(ipAddress);
+    navigator.clipboard.writeText(`${ipAddress}:${port}`);
     toast({
       title: "Copied to clipboard!",
-      description: `Server IP: ${ipAddress}`,
+      description: `Server IP: ${ipAddress}:${port}`,
     });
   };
 
@@ -98,17 +99,19 @@ export default function Join() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Card className="cursor-help">
-                      <CardContent className="p-4 flex items-center gap-4">
-                          <Users className="w-8 h-8 text-primary" />
-                          <div>
-                              <p className="font-bold text-2xl">
-                                {loading ? '...' : `${status?.online ?? 0} / ${status?.max ?? 0}`}
-                              </p>
-                              <p className="text-sm text-muted-foreground">Players Online</p>
-                          </div>
-                      </CardContent>
-                  </Card>
+                  <Link href="/#player-status">
+                    <Card className="cursor-pointer transition-colors hover:bg-muted/50">
+                        <CardContent className="p-4 flex items-center gap-4">
+                            <Users className="w-8 h-8 text-primary" />
+                            <div>
+                                <p className="font-bold text-2xl">
+                                  {loading ? '...' : `${status?.online ?? 0} / ${status?.max ?? 0}`}
+                                </p>
+                                <p className="text-sm text-muted-foreground">Players Online</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                  </Link>
                 </TooltipTrigger>
                 <TooltipContent>
                   {loading ? (
@@ -129,10 +132,10 @@ export default function Join() {
 
             <Card>
                 <CardContent className="p-4 flex items-center gap-4">
-                    {loading || !status?.error ? <Signal className="w-8 h-8 text-accent" /> : <ServerOff className="w-8 h-8 text-destructive" />}
+                    {loading || (status && !status.error) ? <Signal className="w-8 h-8 text-online" /> : <ServerOff className="w-8 h-8 text-destructive" />}
                     <div>
                         <p className="font-bold text-2xl">
-                          {loading ? 'Pinging...' : status?.error ? <span className="text-destructive">Offline</span> : <span className="text-accent">Online</span>}
+                          {loading ? 'Pinging...' : status?.error ? <span className="text-destructive">Offline</span> : <span className="text-online">Online</span>}
                         </p>
                         <p className="text-sm text-muted-foreground">Server Status</p>
                     </div>
