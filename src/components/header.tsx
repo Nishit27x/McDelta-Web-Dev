@@ -38,7 +38,7 @@ export default function Header() {
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-2">
           <Button asChild>
-            <Link href="/#join">Join Now</Link>
+            <a href="https://discord.gg/kSE8qCUY" target="_blank" rel="noopener noreferrer">Join Now</a>
           </Button>
           <Sheet>
             <SheetTrigger asChild>
@@ -59,7 +59,7 @@ export default function Header() {
                 <Link href="/rules" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Rules</Link>
                 <Link href="/status" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Player Status</Link>
                 <Link href="/feedback" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Feedback</Link>
-                <Link href="/#join" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Join</Link>
+                <a href="https://discord.gg/kSE8qCUY" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">Join</a>
               </nav>
             </SheetContent>
           </Sheet>

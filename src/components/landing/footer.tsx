@@ -46,7 +46,7 @@ export default function Footer() {
             <Link href="/rules" className="text-muted-foreground hover:text-accent transition-colors">Rules</Link>
             <Link href="/status" className="text-muted-foreground hover:text-accent transition-colors">Player Status</Link>
             <Link href="/feedback" className="text-muted-foreground hover:text-accent transition-colors">Feedback</Link>
-            <Link href="/#join" className="text-muted-foreground hover:text-accent transition-colors">Join</Link>
+            <a href="https://discord.gg/kSE8qCUY" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent transition-colors">Join</a>
           </nav>
           <div className="flex items-center space-x-4 justify-center md:justify-end">
             <a href="https://discord.gg/kSE8qCUY" aria-label="Discord" className="text-muted-foreground hover:text-accent transition-colors"><DiscordIcon className="w-6 h-6" /></a>
