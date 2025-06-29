@@ -17,7 +17,9 @@ interface ServerStatus {
 
 export default function Join() {
   const { toast } = useToast();
-  const serverIp = 'paid-1.guardxhosting.in:25501';
+  const displayIp = 'paid-1.guardxhosting.in';
+  const fullIpToCopy = 'paid-1.guardxhosting.in:25501';
+
 
   const [status, setStatus] = useState<ServerStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,10 +48,10 @@ export default function Join() {
   }, []);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(serverIp);
+    navigator.clipboard.writeText(fullIpToCopy);
     toast({
       title: "Copied to clipboard!",
-      description: `Server IP: ${serverIp}`,
+      description: `Server IP: ${fullIpToCopy}`,
     });
   };
 
@@ -63,7 +65,7 @@ export default function Join() {
         <div className="mt-8 flex flex-col md:flex-row items-center justify-center gap-6">
           <Card className="bg-background/50 shadow-inner-lg">
             <CardContent className="p-4 flex items-center gap-4">
-              <span className="font-mono text-lg tracking-widest">{serverIp}</span>
+              <span className="font-mono text-lg tracking-widest">{displayIp}</span>
               <Button variant="ghost" size="icon" onClick={copyToClipboard} aria-label="Copy server IP" suppressHydrationWarning>
                 <Copy className="w-5 h-5" />
               </Button>
