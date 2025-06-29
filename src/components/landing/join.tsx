@@ -17,8 +17,8 @@ interface ServerStatus {
 
 export default function Join() {
   const { toast } = useToast();
-  const displayIp = 'paid-1.guardxhosting.in';
-  const fullIpToCopy = 'paid-1.guardxhosting.in:25501';
+  const ipAddress = 'paid-1.guardxhosting.in';
+  const port = '25501';
 
 
   const [status, setStatus] = useState<ServerStatus | null>(null);
@@ -47,11 +47,19 @@ export default function Join() {
     return () => clearInterval(interval);
   }, []);
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(fullIpToCopy);
+  const copyIpToClipboard = () => {
+    navigator.clipboard.writeText(ipAddress);
     toast({
       title: "Copied to clipboard!",
-      description: `Server IP: ${fullIpToCopy}`,
+      description: `Server IP: ${ipAddress}`,
+    });
+  };
+
+  const copyPortToClipboard = () => {
+    navigator.clipboard.writeText(port);
+    toast({
+      title: "Copied to clipboard!",
+      description: `Server Port: ${port}`,
     });
   };
 
@@ -64,11 +72,19 @@ export default function Join() {
         </p>
         <div className="mt-8 flex flex-col md:flex-row items-center justify-center gap-6">
           <Card className="bg-background/50 shadow-inner-lg">
-            <CardContent className="p-4 flex items-center gap-4">
-              <span className="font-mono text-lg tracking-widest">{displayIp}</span>
-              <Button variant="ghost" size="icon" onClick={copyToClipboard} aria-label="Copy server IP" suppressHydrationWarning>
-                <Copy className="w-5 h-5" />
-              </Button>
+            <CardContent className="p-4 flex flex-col gap-2">
+              <div className="flex items-center justify-between gap-4 w-full">
+                <span className="font-mono text-lg tracking-widest">IP: {ipAddress}</span>
+                <Button variant="ghost" size="icon" onClick={copyIpToClipboard} aria-label="Copy server IP" suppressHydrationWarning>
+                  <Copy className="w-5 h-5" />
+                </Button>
+              </div>
+               <div className="flex items-center justify-between gap-4 w-full">
+                <span className="font-mono text-lg tracking-widest">Port: {port}</span>
+                <Button variant="ghost" size="icon" onClick={copyPortToClipboard} aria-label="Copy server port" suppressHydrationWarning>
+                  <Copy className="w-5 h-5" />
+                </Button>
+              </div>
             </CardContent>
           </Card>
           <Button asChild size="lg" className="bg-[#5865F2] hover:bg-[#5865F2]/90 text-white" suppressHydrationWarning>
