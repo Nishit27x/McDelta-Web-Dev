@@ -71,6 +71,7 @@ export function UserSessionProvider({ children }: { children: React.ReactNode })
       return;
     }
     const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
+      setIsLoading(true);
       setUser(authUser);
       if (authUser) {
         await fetchUserProfile();
