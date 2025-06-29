@@ -155,7 +155,7 @@ export default function RulesPage() {
           </p>
         </div>
 
-        <Card className="mb-8 bg-card/50">
+        <Card className="mb-12 bg-card/50">
           <CardHeader>
             <CardTitle className="text-2xl text-center">Preamble</CardTitle>
           </CardHeader>
@@ -180,19 +180,19 @@ export default function RulesPage() {
                     {deltanRules.map((rule, index) => (
                       <div key={index}>
                         <h4 className="font-bold text-lg mb-2 text-primary">{rule.title}</h4>
-                        <ul className="list-none space-y-2 pl-4 text-muted-foreground">
+                        <ul className="list-disc list-inside space-y-2 pl-4 text-muted-foreground">
                           {rule.points.map((point, pIndex) => (
                             <li key={pIndex}>{point}</li>
                           ))}
                           {rule.subpoints && (
-                            <ul className="list-none space-y-1 pl-8 pt-1">
+                            <ul className="list-[lower-alpha] list-inside space-y-1 pl-8 pt-1">
                                 {rule.subpoints.map((subpoint, sIndex) => (
                                     <li key={sIndex}>{subpoint}</li>
                                 ))}
                             </ul>
                           )}
                            {rule.points2 && (
-                            <ul className="list-none space-y-2 pt-2">
+                            <ul className="list-disc list-inside space-y-2 pt-2">
                                 {rule.points2.map((point2, p2Index) => (
                                     <li key={p2Index}>{point2}</li>
                                 ))}
@@ -219,7 +219,7 @@ export default function RulesPage() {
                         {adminRules.map((rule, index) => (
                             <div key={index}>
                                 <h4 className="font-bold text-lg mb-2 text-primary">{rule.title}</h4>
-                                <ul className="list-none space-y-2 pl-4 text-muted-foreground">
+                                <ul className="list-disc list-inside space-y-2 pl-4 text-muted-foreground">
                                     {rule.points.map((point, pIndex) => (
                                         <li key={pIndex}>{point}</li>
                                     ))}

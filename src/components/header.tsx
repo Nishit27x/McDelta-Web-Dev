@@ -16,28 +16,25 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const DiamondIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="M12 2L2 12l10 10 10-10L12 2z" />
-  </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <defs>
+            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style={{stopColor:'hsl(var(--accent))',stopOpacity:1}} />
+            <stop offset="100%" style={{stopColor:'hsl(var(--primary))',stopOpacity:1}} />
+            </linearGradient>
+        </defs>
+        <path d="M12 2L2 12l10 10 10-10L12 2z" fill="url(#grad1)" stroke="hsl(var(--accent-foreground))" />
+    </svg>
 );
 
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
+    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center">
         <Link href="/" className="mr-6 flex items-center space-x-2">
-          <DiamondIcon className="h-6 w-6 text-accent" />
-          <span className="hidden font-bold sm:inline-block font-jokerman">
+          <DiamondIcon className="h-8 w-8" />
+          <span className="hidden font-bold sm:inline-block font-jokerman text-lg">
             McDelta SMP
           </span>
         </Link>
