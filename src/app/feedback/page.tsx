@@ -11,28 +11,29 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Star } from 'lucide-react';
+import { Star, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useUserSession, AuthWrapper } from '@/contexts/user-session-context';
+import SignInModal from '@/components/sign-in-modal';
 
 // --- Feedback Form Schema and Component ---
 
 const feedbackFormSchema = z.object({
-  name: z.string().min(3, "Gamertag must be at least 3 characters.").max(20),
   message: z.string().min(10, "Message must be at least 10 characters.").max(500),
   rating: z.number().min(1, "Please provide a rating.").max(5),
 });
 
 function FeedbackForm({ onFeedbackSubmit }: { onFeedbackSubmit: (newReview: Review) => void }) {
   const { toast } = useToast();
+  const { profile } = useUserSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hoverRating, setHoverRating] = useState(0);
 
   const form = useForm<z.infer<typeof feedbackFormSchema>>({
     resolver: zodResolver(feedbackFormSchema),
     defaultValues: {
-      name: '',
       message: '',
       rating: 0,
     },
@@ -76,24 +77,11 @@ function FeedbackForm({ onFeedbackSubmit }: { onFeedbackSubmit: (newReview: Revi
     <Card>
       <CardHeader>
         <CardTitle>Leave Your Feedback</CardTitle>
-        <CardDescription>Let us know what you think about McDelta SMP!</CardDescription>
+        <CardDescription>You are signed in as <span className="font-bold text-primary">{profile?.gamertag}</span>.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Minecraft Gamertag</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Steve" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="rating"
@@ -184,15 +172,17 @@ function ReviewCard({ review }: { review: Review }) {
     );
 }
 
-// --- Main Page Component ---
+// --- Main Content Component ---
 
-export default function FeedbackPage() {
+function FeedbackContent() {
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+  const { profile } = useUserSession();
+  const [showSignInModal, setShowSignInModal] = useState(false);
 
   useEffect(() => {
     async function fetchReviews() {
-      setIsLoading(true);
+      setIsLoadingReviews(true);
       try {
         const response = await fetch('/api/feedback');
         if (response.ok) {
@@ -202,7 +192,7 @@ export default function FeedbackPage() {
       } catch (error) {
         console.error("Failed to fetch reviews", error);
       } finally {
-        setIsLoading(false);
+        setIsLoadingReviews(false);
       }
     }
     fetchReviews();
@@ -211,18 +201,37 @@ export default function FeedbackPage() {
   const handleNewFeedback = (newReview: Review) => {
     setReviews(prevReviews => [newReview, ...prevReviews]);
   };
-
+  
   return (
-    <div className="flex flex-col min-h-dvh bg-background">
-      <Header />
-      <main className="flex-grow container mx-auto px-4 py-16">
+     <>
+        {showSignInModal && (
+          <SignInModal 
+            onSuccess={() => setShowSignInModal(false)} 
+            onCancel={() => setShowSignInModal(false)}
+          />
+        )}
         <div className="grid lg:grid-cols-3 gap-12">
             <div className="lg:col-span-1">
-                <FeedbackForm onFeedbackSubmit={handleNewFeedback} />
+                {profile ? (
+                    <FeedbackForm onFeedbackSubmit={handleNewFeedback} />
+                ) : (
+                   <Card className="h-full flex flex-col items-center justify-center text-center p-8">
+                       <CardHeader>
+                           <CardTitle>Join the Conversation</CardTitle>
+                           <CardDescription>Sign in with your gamertag to leave feedback and let your voice be heard.</CardDescription>
+                       </CardHeader>
+                       <CardContent>
+                           <Button onClick={() => setShowSignInModal(true)}>
+                               <User className="mr-2 h-4 w-4" />
+                               Sign In to Leave Feedback
+                           </Button>
+                       </CardContent>
+                   </Card>
+                )}
             </div>
             <div className="lg:col-span-2 space-y-6">
                 <h3 className="text-3xl font-bold text-center lg:text-left">Recent Feedback</h3>
-                {isLoading ? (
+                {isLoadingReviews ? (
                     <div className="space-y-4 pt-4">
                         <Skeleton className="h-28 w-full rounded-xl" />
                         <Skeleton className="h-28 w-full rounded-xl" />
@@ -239,6 +248,20 @@ export default function FeedbackPage() {
                 )}
             </div>
         </div>
+     </>
+  )
+}
+
+
+// --- Main Page Component ---
+export default function FeedbackPage() {
+  return (
+    <div className="flex flex-col min-h-dvh bg-background">
+      <Header />
+      <main className="flex-grow container mx-auto px-4 py-16">
+        <AuthWrapper>
+            <FeedbackContent />
+        </AuthWrapper>
       </main>
       <Footer />
     </div>

@@ -1,39 +1,33 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import admin from '@/lib/firebase-admin';
 import * as z from 'zod';
+import { verifySession } from '@/lib/session-verifier';
 
 const feedbackSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters.").max(50),
   message: z.string().min(10, "Message must be at least 10 characters.").max(500),
   rating: z.number().min(1).max(5),
 });
 
-// Check if Firebase Admin is initialized
 function isFirebaseAdminInitialized() {
   return admin.apps.length > 0;
 }
 
 export async function GET() {
   if (!isFirebaseAdminInitialized()) {
-    // Return empty array if Firebase is not configured, so the page doesn't break.
     return NextResponse.json([], { status: 200 });
   }
-
   try {
     const db = admin.database();
     const ref = db.ref('reviews');
     const snapshot = await ref.orderByChild('createdAt').limitToLast(50).once('value');
-
     if (snapshot.exists()) {
       const data = snapshot.val();
-      // Transform the object of reviews into an array and sort descending
       const reviews = Object.keys(data).map(key => ({
         id: key,
         ...data[key],
       })).sort((a, b) => b.createdAt - a.createdAt);
       return NextResponse.json(reviews, { status: 200 });
     }
-
     return NextResponse.json([], { status: 200 });
   } catch (error) {
     console.error('Error fetching reviews:', error);
@@ -42,12 +36,12 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  // Check for Firebase config first. If it's missing, fail early with a clear error.
-  if (!isFirebaseAdminInitialized()) {
-    return NextResponse.json(
-        { error: 'Server configuration error: The feedback system is currently unavailable.' },
-        { status: 503 }
-    );
+  let decodedToken;
+  try {
+    // This will throw an error if the session is not valid, protecting the endpoint.
+    decodedToken = await verifySession(request);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 401 });
   }
 
   let body;
@@ -64,20 +58,24 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: firstError }, { status: 400 });
   }
   
-  const { name, message, rating } = validation.data;
+  const { message, rating } = validation.data;
+  const { uid, display_name: gamertag, picture: avatar } = decodedToken;
 
-  // Proceed to save the data to the database.
+  if (!gamertag) {
+     return NextResponse.json({ error: 'Gamertag not found in user session.' }, { status: 400 });
+  }
+  
   try {
     const db = admin.database();
     const ref = db.ref('reviews');
     
     const newReview = {
-        name,
+        name: gamertag,
         message,
         rating,
-        avatar: `https://crafatar.com/avatars/${name}?overlay`,
+        avatar: avatar || `https://crafatar.com/avatars/${uid}?overlay`, // Use token picture or fallback
         createdAt: Date.now(),
-        userAgent: request.headers.get('user-agent') || 'unknown',
+        uid: uid
     };
 
     const newReviewRef = await ref.push(newReview);

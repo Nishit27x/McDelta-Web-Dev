@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import BuyMeACoffeeButton from '@/components/buy-me-a-coffee-button';
+import { UserSessionProvider } from '@/contexts/user-session-context';
 
 export const metadata: Metadata = {
   title: 'McDelta SMP',
@@ -22,7 +23,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Jokerman&family=Poppins:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className={cn('font-body antialiased')}>
-        {children}
+        <UserSessionProvider>
+            {children}
+        </UserSessionProvider>
         <Toaster />
         <BuyMeACoffeeButton />
       </body>

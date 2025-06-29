@@ -1,126 +1,35 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import admin from '@/lib/firebase-admin';
-import * as z from 'zod';
-import { randomUUID } from 'crypto';
-import { cookies } from 'next/headers';
+import { verifySession } from '@/lib/session-verifier';
 
-const gamertagSchema = z.object({
-  gamertag: z.string().min(3, "Gamertag must be at least 3 characters.").max(20, "Gamertag cannot be longer than 20 characters."),
-});
-
-const getAdminGamertags = () => {
-    return (process.env.ADMIN_GAMERTAGS || '').split(',').map(g => g.trim().toLowerCase()).filter(Boolean);
-}
-
+// This endpoint now verifies the session cookie and returns the user's profile data.
 export async function GET(request: NextRequest) {
-  const cookieStore = cookies();
-  const sessionId = cookieStore.get('sessionId')?.value;
-
-  if (!sessionId) {
-    return NextResponse.json({ error: 'No session found.' }, { status: 404 });
-  }
-
   try {
-    if (!admin.apps.length) {
-      return NextResponse.json({ error: 'Server configuration error: Firebase Admin SDK not initialized.' }, { status: 500 });
-    }
+    const decodedToken = await verifySession(request);
     const db = admin.database();
-    const ref = db.ref(`usersBySessionId/${sessionId}`);
-    const snapshot = await ref.once('value');
+    
+    const userRef = db.ref(`users/${decodedToken.uid}`);
+    const snapshot = await userRef.once('value');
 
-    if (snapshot.exists()) {
-      const userData = snapshot.val();
-      const adminGamertags = getAdminGamertags();
-
-      const responseData = {
-          ...userData,
-          isAdmin: adminGamertags.includes(userData.gamertag.toLowerCase())
-      };
-
-      // Update last seen timestamp
-      await ref.update({ lastSeen: new Date().toISOString() });
-      return NextResponse.json(responseData, { status: 200 });
-    } else {
-      // Session ID in cookie is invalid, maybe DB was cleared. Delete it.
-      cookieStore.delete('sessionId');
-      return NextResponse.json({ error: 'User session not found.' }, { status: 404 });
+    if (!snapshot.exists()) {
+      return NextResponse.json({ error: 'User profile not found.' }, { status: 404 });
     }
-  } catch (error) {
+
+    const userProfile = snapshot.val();
+    
+    // Check if user is an admin
+    const adminGamertags = (process.env.ADMIN_GAMERTAGS || '').split(',').map(g => g.trim().toLowerCase()).filter(Boolean);
+    const isAdmin = adminGamertags.includes(userProfile.gamertag.toLowerCase());
+
+    return NextResponse.json({ ...userProfile, isAdmin });
+
+  } catch (error: any) {
+    // AuthError is thrown by verifySession for specific, clear reasons.
+    if (error.name === 'AuthError') {
+      return NextResponse.json({ error: error.message }, { status: 401 });
+    }
+
     console.error('Error fetching user session:', error);
-    return NextResponse.json({ error: 'Failed to fetch user session.' }, { status: 500 });
-  }
-}
-
-
-export async function POST(request: NextRequest) {
-  const cookieStore = cookies();
-
-  let body;
-  try {
-    body = await request.json();
-  } catch (e) {
-    return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 });
-  }
-
-  const validation = gamertagSchema.safeParse(body);
-  if (!validation.success) {
-    const errorMessages = validation.error.flatten().fieldErrors;
-    const firstError = Object.values(errorMessages).flatMap(e => e)?.[0] || "Invalid input."
-    return NextResponse.json({ error: firstError }, { status: 400 });
-  }
-  
-  const { gamertag } = validation.data;
-  const adminGamertags = getAdminGamertags();
-  const isAdmin = adminGamertags.includes(gamertag.toLowerCase());
-  const now = new Date().toISOString();
-
-  try {
-    if (!admin.apps.length) {
-      return NextResponse.json({ error: 'Server configuration error: Firebase Admin SDK not initialized. Please check your environment variables.' }, { status: 500 });
-    }
-
-    const db = admin.database();
-    let sessionId = cookieStore.get('sessionId')?.value;
-    
-    // Path 1: A session ID already exists in the cookie.
-    if (sessionId) {
-      const userRef = db.ref(`usersBySessionId/${sessionId}`);
-      const snapshot = await userRef.once('value');
-
-      // If the user exists for that session, update their gamertag and lastSeen.
-      if (snapshot.exists()) {
-        const updatedData = { gamertag, lastSeen: now };
-        await userRef.update(updatedData);
-        
-        const responseData = { ...snapshot.val(), ...updatedData, isAdmin };
-        return NextResponse.json(responseData, { status: 200 });
-      }
-    }
-
-    // Path 2: No valid session found. Create a new one.
-    const newSessionId = randomUUID();
-    const crafatarId = randomUUID();
-    const newUser = {
-      gamertag,
-      avatar: `https://crafatar.com/avatars/${crafatarId}?overlay`,
-      createdAt: now,
-      lastSeen: now,
-    };
-    
-    await db.ref(`usersBySessionId/${newSessionId}`).set(newUser);
-
-    cookieStore.set('sessionId', newSessionId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV !== 'development',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 365, // 1 year
-    });
-    
-    const responseData = { ...newUser, isAdmin };
-    return NextResponse.json(responseData, { status: 201 });
-
-  } catch (error) {
-    console.error('Error creating or updating user session:', error);
-    return NextResponse.json({ error: 'Failed to create or update user session.' }, { status: 500 });
+    return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 });
   }
 }
