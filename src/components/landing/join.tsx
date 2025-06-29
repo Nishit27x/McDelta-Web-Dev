@@ -111,10 +111,10 @@ export default function Join() {
 
             <Card>
                 <CardContent className="p-4 flex items-center gap-4">
-                    {loading || !status?.error ? <Signal className="w-8 h-8 text-primary" /> : <ServerOff className="w-8 h-8 text-destructive" />}
+                    {loading || !status?.error ? <Signal className="w-8 h-8 text-accent" /> : <ServerOff className="w-8 h-8 text-destructive" />}
                     <div>
                         <p className="font-bold text-2xl">
-                          {loading ? 'Pinging...' : status?.error ? <span className="text-destructive">Offline</span> : <span className="text-primary">Online</span>}
+                          {loading ? 'Pinging...' : status?.error ? <span className="text-destructive">Offline</span> : <span className="text-accent">Online</span>}
                         </p>
                         <p className="text-sm text-muted-foreground">Server Status</p>
                     </div>
