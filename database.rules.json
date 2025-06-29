@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "reviewsByIP": {
+      ".read": true,
+      "$ip_key": {
+        ".validate": "newData.hasChildren(['name', 'message', 'rating', 'ip', 'userAgent', 'createdAt', 'lastEditedAt']) && newData.child('name').isString() && newData.child('name').val().length >= 2 && newData.child('name').val().length <= 50 && newData.child('message').isString() && newData.child('message').val().length >= 10 && newData.child('message').val().length <= 500 && newData.child('rating').isNumber() && newData.child('rating').val() >= 1 && newData.child('rating').val() <= 5"
+      }
+    }
+  }
+}

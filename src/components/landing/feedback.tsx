@@ -12,7 +12,8 @@ import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carouse
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const feedbackSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters.").max(50),
@@ -20,11 +21,13 @@ const feedbackSchema = z.object({
   rating: z.number().min(1, "Please provide a rating.").max(5),
 });
 
-const recentFeedback = [
-  { name: 'Steve', avatar: 'https://placehold.co/40x40.png', hint: 'pixel avatar', rating: 5, message: "Absolutely the best Lifesteal SMP I've ever played. The community is fantastic!" },
-  { name: 'Alex', avatar: 'https://placehold.co/40x40.png', hint: 'pixel avatar', rating: 5, message: "The PvP events are intense and the custom builds are epic. 10/10." },
-  { name: 'NoobSlayer69', avatar: 'https://placehold.co/40x40.png', hint: 'pixel avatar', rating: 4, message: "Great server, very challenging. Lost a few hearts but it's part of the fun." },
-];
+interface Review {
+  id: string;
+  name: string;
+  rating: number;
+  message: string;
+  createdAt: number;
+}
 
 function StarRating({ value, onChange }: { value: number; onChange: (value: number) => void }) {
     return (
@@ -42,18 +45,60 @@ function StarRating({ value, onChange }: { value: number; onChange: (value: numb
 
 export default function Feedback() {
   const { toast } = useToast();
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const form = useForm<z.infer<typeof feedbackSchema>>({
     resolver: zodResolver(feedbackSchema),
     defaultValues: { name: "", message: "", rating: 0 },
   });
 
-  function onSubmit(values: z.infer<typeof feedbackSchema>) {
-    console.log(values);
-    toast({
-      title: "Feedback Sent!",
-      description: "Thanks for sharing your thoughts with us.",
-    });
-    form.reset({ name: "", message: "", rating: 0 });
+  const fetchReviews = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch('/api/feedback');
+      if (res.ok) {
+        const data = await res.json();
+        setReviews(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch reviews", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+
+  async function onSubmit(values: z.infer<typeof feedbackSchema>) {
+    try {
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Something went wrong');
+      }
+
+      toast({
+        title: response.status === 201 ? "Feedback submitted!" : "Feedback updated!",
+        description: "Thanks for sharing your thoughts with us.",
+      });
+      form.reset({ name: "", message: "", rating: 0 });
+      fetchReviews(); // Refresh the list
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: (error as Error).message,
+      });
+    }
   }
 
   return (
@@ -106,35 +151,55 @@ export default function Feedback() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit">Submit Feedback</Button>
+                  <Button type="submit" disabled={form.formState.isSubmitting}>
+                    {form.formState.isSubmitting ? 'Submitting...' : 'Submit Feedback'}
+                  </Button>
                 </form>
               </Form>
             </CardContent>
           </Card>
 
           <div className="flex flex-col justify-center">
-            <Carousel opts={{ loop: true }} className="w-full">
-              <CarouselContent>
-                {recentFeedback.map((fb, index) => (
-                  <CarouselItem key={index}>
-                    <Card className="bg-card border-2 border-primary/20 shadow-primary/10">
-                      <CardContent className="p-6 flex flex-col items-center text-center">
-                        <Avatar className="w-16 h-16 mb-4 border-2 border-primary">
-                          <AvatarImage src={fb.avatar} data-ai-hint={fb.hint}/>
-                          <AvatarFallback>{fb.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <h4 className="font-bold text-lg">{fb.name}</h4>
-                        <div className="flex my-2">
-                           {Array(fb.rating).fill(0).map((_, i) => <Star key={i} className="w-5 h-5 text-primary fill-primary" />)}
-                           {Array(5-fb.rating).fill(0).map((_, i) => <Star key={i} className="w-5 h-5 text-muted-foreground/50" />)}
-                        </div>
-                        <p className="text-muted-foreground italic">"{fb.message}"</p>
-                      </CardContent>
-                    </Card>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
+            {isLoading ? (
+                <Card className="bg-card border-2 border-primary/20 shadow-primary/10">
+                    <CardContent className="p-6 flex flex-col items-center text-center">
+                        <Skeleton className="w-16 h-16 rounded-full mb-4" />
+                        <Skeleton className="h-6 w-24 mb-2" />
+                        <Skeleton className="h-5 w-32 mb-4" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-3/4 mt-1" />
+                    </CardContent>
+                </Card>
+            ) : reviews.length > 0 ? (
+                <Carousel opts={{ loop: true }} className="w-full">
+                  <CarouselContent>
+                    {reviews.map((fb) => (
+                      <CarouselItem key={fb.id}>
+                        <Card className="bg-card border-2 border-primary/20 shadow-primary/10">
+                          <CardContent className="p-6 flex flex-col items-center text-center">
+                            <Avatar className="w-16 h-16 mb-4 border-2 border-primary">
+                              <AvatarImage src="https://placehold.co/40x40.png" data-ai-hint="pixel avatar" />
+                              <AvatarFallback>{fb.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <h4 className="font-bold text-lg">{fb.name}</h4>
+                            <div className="flex my-2">
+                              {Array(fb.rating).fill(0).map((_, i) => <Star key={i} className="w-5 h-5 text-primary fill-primary" />)}
+                              {Array(5 - fb.rating).fill(0).map((_, i) => <Star key={i} className="w-5 h-5 text-muted-foreground/50" />)}
+                            </div>
+                            <p className="text-muted-foreground italic">"{fb.message}"</p>
+                          </CardContent>
+                        </Card>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                </Carousel>
+            ) : (
+                <Card className="bg-card border-2 border-primary/20 shadow-primary/10">
+                    <CardContent className="p-6 text-center text-muted-foreground">
+                        <p>No feedback yet. Be the first to leave a review!</p>
+                    </CardContent>
+                </Card>
+            )}
           </div>
         </div>
       </div>
