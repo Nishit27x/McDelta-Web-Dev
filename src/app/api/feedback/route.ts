@@ -8,20 +8,6 @@ const feedbackSchema = z.object({
   rating: z.number().min(1).max(5),
 });
 
-function getIp(request: NextRequest) {
-    let ip = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim();
-    if (!ip) {
-      // Fallback for local development where IP might not be available
-      if (process.env.NODE_ENV === 'development') {
-        ip = '127.0.0.1'; // Use a mock IP for dev
-      } else {
-        return 'unknown';
-      }
-    }
-    // Sanitize IP to use as a Firebase key
-    return ip.replace(/\./g, '_').replace(/:/g, '_');
-}
-
 export async function GET() {
   try {
     const db = admin.database();
@@ -46,10 +32,15 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const sanitizedIp = getIp(request);
-  if (sanitizedIp === 'unknown') {
+  let ip = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim();
+  if (!ip) {
+    if (process.env.NODE_ENV === 'development') {
+      ip = '127.0.0.1'; // Use a mock IP for dev
+    } else {
       return NextResponse.json({ error: 'Could not identify IP address.' }, { status: 400 });
+    }
   }
+  const sanitizedIp = ip.replace(/\./g, '_').replace(/:/g, '_');
   
   const userAgent = request.headers.get('user-agent') || 'unknown';
 
@@ -103,7 +94,7 @@ export async function POST(request: NextRequest) {
         message,
         rating,
         avatar,
-        ip: request.ip, // Store original IP for reference
+        ip: ip, // Store original IP for reference
         userAgent,
         createdAt: now,
         lastEditedAt: now,

@@ -9,25 +9,16 @@ const gamertagSchema = z.object({
   gamertag: z.string().min(3).max(20),
 });
 
-function getIp(request: NextRequest) {
-    let ip = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim();
-    if (!ip) {
-      // Fallback for local development where IP might not be available
-      if (process.env.NODE_ENV === 'development') {
-        ip = '127.0.0.1'; // Use a mock IP for dev
-      } else {
-        return 'unknown';
-      }
-    }
-    // Sanitize IP to use as a Firebase key
-    return ip.replace(/\./g, '_').replace(/:/g, '_');
-}
-
 export async function GET(request: NextRequest) {
-  const sanitizedIp = getIp(request);
-  if (sanitizedIp === 'unknown') {
+  let ip = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim();
+  if (!ip) {
+    if (process.env.NODE_ENV === 'development') {
+      ip = '127.0.0.1'; // Use a mock IP for dev
+    } else {
       return NextResponse.json({ error: 'Could not identify IP address.' }, { status: 400 });
+    }
   }
+  const sanitizedIp = ip.replace(/\./g, '_').replace(/:/g, '_');
 
   try {
     const db = admin.database();
@@ -49,10 +40,16 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const sanitizedIp = getIp(request);
-  if (sanitizedIp === 'unknown') {
-      return NextResponse.json({ error: 'Could not identify IP address.' }, { status: 400 });
+  let ip = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim();
+  if (!ip) {
+      if (process.env.NODE_ENV === 'development') {
+        ip = '127.0.0.1'; // Use a mock IP for dev
+      } else {
+        return NextResponse.json({ error: 'Could not identify IP address.' }, { status: 400 });
+      }
   }
+  const sanitizedIp = ip.replace(/\./g, '_').replace(/:/g, '_');
+
 
   let body;
   try {
@@ -82,7 +79,7 @@ export async function POST(request: NextRequest) {
     const newUser = {
       gamertag,
       avatar: `https://crafatar.com/avatars/${userId}?overlay`,
-      ip: request.ip,
+      ip: ip,
       createdAt: now,
       lastSeen: now,
     };
