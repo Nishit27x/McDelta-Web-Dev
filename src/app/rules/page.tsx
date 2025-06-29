@@ -144,10 +144,10 @@ export default function RulesPage() {
       <Header />
       <main className="flex-grow container mx-auto px-4 py-16 md:py-24">
         <div className="text-center mb-16">
-          <h1 className="font-jokerman text-7xl md:text-8xl text-primary drop-shadow-[0_4px_4px_rgba(0,0,0,0.4)]">
+          <h1 className="font-jokerman text-7xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-b from-neutral-300 via-neutral-500 to-neutral-600 drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
             McDelta SMP
           </h1>
-          <h2 className="font-headline text-4xl md:text-5xl text-muted-foreground tracking-widest uppercase mt-2">
+          <h2 className="font-headline text-4xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-b from-neutral-400 to-neutral-600 tracking-widest uppercase mt-2 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
             Rules
           </h2>
           <p className="text-lg text-muted-foreground mt-8 max-w-3xl mx-auto">
