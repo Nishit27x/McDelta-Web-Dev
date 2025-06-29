@@ -24,14 +24,15 @@ export default function Join() {
 
   useEffect(() => {
     const fetchStatus = async () => {
+      setLoading(true);
       try {
         const res = await fetch('/api/mc-status');
         const data = await res.json();
-         if (!res.ok) {
-          throw new Error(data.error || 'Server response was not ok');
-        }
+        // The API returns a JSON response for both success and error cases,
+        // so we can just set the status with the data we receive.
         setStatus(data);
       } catch (error) {
+        // This will catch network errors or if res.json() fails.
         console.error("Failed to fetch server status:", error);
         setStatus({ online: 0, max: 0, players: [], error: "Could not retrieve server status." });
       } finally {
