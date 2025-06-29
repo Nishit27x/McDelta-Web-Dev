@@ -14,6 +14,7 @@ import { Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import React, { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useUserSession } from "@/contexts/user-session-context";
 
 const feedbackSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters.").max(50),
@@ -27,6 +28,7 @@ interface Review {
   rating: number;
   message: string;
   createdAt: number;
+  avatar?: string;
 }
 
 function StarRating({ value, onChange }: { value: number; onChange: (value: number) => void }) {
@@ -46,7 +48,8 @@ function StarRating({ value, onChange }: { value: number; onChange: (value: numb
 export default function Feedback() {
   const { toast } = useToast();
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+  const { session, isLoading: isLoadingSession } = useUserSession();
 
   const form = useForm<z.infer<typeof feedbackSchema>>({
     resolver: zodResolver(feedbackSchema),
@@ -55,7 +58,7 @@ export default function Feedback() {
 
   const fetchReviews = async () => {
     try {
-      setIsLoading(true);
+      setIsLoadingReviews(true);
       const res = await fetch('/api/feedback');
       if (res.ok) {
         const data = await res.json();
@@ -64,13 +67,19 @@ export default function Feedback() {
     } catch (error) {
       console.error("Failed to fetch reviews", error);
     } finally {
-      setIsLoading(false);
+      setIsLoadingReviews(false);
     }
   };
 
   useEffect(() => {
     fetchReviews();
   }, []);
+
+  useEffect(() => {
+    if (session?.gamertag) {
+      form.setValue('name', session.gamertag);
+    }
+  }, [session, form]);
 
   async function onSubmit(values: z.infer<typeof feedbackSchema>) {
     try {
@@ -90,7 +99,7 @@ export default function Feedback() {
         title: response.status === 201 ? "Feedback submitted!" : "Feedback updated!",
         description: "Thanks for sharing your thoughts with us.",
       });
-      form.reset({ name: "", message: "", rating: 0 });
+      form.reset({ name: session?.gamertag || "", message: "", rating: 0 });
       fetchReviews(); // Refresh the list
     } catch (error) {
       toast({
@@ -108,59 +117,67 @@ export default function Feedback() {
           <h2 className="text-3xl md:text-4xl font-bold">Player Feedback</h2>
           <p className="text-lg text-muted-foreground mt-2">See what our players have to say.</p>
         </div>
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
           <Card>
             <CardHeader>
               <CardTitle>Leave Your Feedback</CardTitle>
             </CardHeader>
             <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Your Name</FormLabel>
-                        <FormControl><Input placeholder="e.g., Steve" {...field} /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="message"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Message</FormLabel>
-                        <FormControl><Textarea rows={4} placeholder="Tell us what you think..." {...field} /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="rating"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Rating</FormLabel>
-                        <FormControl>
-                            <StarRating value={field.value} onChange={field.onChange} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" disabled={form.formState.isSubmitting}>
-                    {form.formState.isSubmitting ? 'Submitting...' : 'Submit Feedback'}
-                  </Button>
-                </form>
-              </Form>
+              {isLoadingSession ? (
+                <div className="space-y-4">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-10 w-32" />
+                </div>
+              ) : (
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Your Gamertag</FormLabel>
+                          <FormControl><Input placeholder="e.g., Steve" {...field} readOnly /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="message"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Message</FormLabel>
+                          <FormControl><Textarea rows={4} placeholder="Tell us what you think..." {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="rating"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Rating</FormLabel>
+                          <FormControl>
+                              <StarRating value={field.value} onChange={field.onChange} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" disabled={form.formState.isSubmitting}>
+                      {form.formState.isSubmitting ? 'Submitting...' : 'Submit Feedback'}
+                    </Button>
+                  </form>
+                </Form>
+              )}
             </CardContent>
           </Card>
 
           <div className="flex flex-col justify-center">
-            {isLoading ? (
+            {isLoadingReviews ? (
                 <Card className="bg-card border-2 border-primary/20 shadow-primary/10">
                     <CardContent className="p-6 flex flex-col items-center text-center">
                         <Skeleton className="w-16 h-16 rounded-full mb-4" />
@@ -178,7 +195,7 @@ export default function Feedback() {
                         <Card className="bg-card border-2 border-primary/20 shadow-primary/10">
                           <CardContent className="p-6 flex flex-col items-center text-center">
                             <Avatar className="w-16 h-16 mb-4 border-2 border-primary">
-                              <AvatarImage src="https://placehold.co/40x40.png" data-ai-hint="pixel avatar" />
+                              <AvatarImage src={fb.avatar || "https://placehold.co/40x40.png"} data-ai-hint="pixel avatar" />
                               <AvatarFallback>{fb.name.charAt(0)}</AvatarFallback>
                             </Avatar>
                             <h4 className="font-bold text-lg">{fb.name}</h4>

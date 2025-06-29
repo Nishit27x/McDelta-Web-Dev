@@ -62,6 +62,17 @@ export async function POST(request: NextRequest) {
 
   try {
     const db = admin.database();
+    
+    // Fetch user session to get avatar
+    const userRef = db.ref(`usersByIP/${sanitizedIp}`);
+    const userSnapshot = await userRef.once('value');
+    if (!userSnapshot.exists()) {
+      return NextResponse.json({ error: 'No user session found for this IP. Cannot submit feedback.' }, { status: 403 });
+    }
+    const userData = userSnapshot.val();
+    const avatar = userData.avatar;
+    
+    // Now handle the review
     const ref = db.ref(`reviewsByIP/${sanitizedIp}`);
     const now = Date.now();
 
@@ -73,6 +84,7 @@ export async function POST(request: NextRequest) {
         name,
         message,
         rating,
+        avatar,
         lastEditedAt: now,
         userAgent, // Optionally update user agent on edit
       });
@@ -83,6 +95,7 @@ export async function POST(request: NextRequest) {
         name,
         message,
         rating,
+        avatar,
         ip: request.ip, // Store original IP for reference
         userAgent,
         createdAt: now,

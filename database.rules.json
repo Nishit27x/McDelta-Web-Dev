@@ -3,6 +3,10 @@
     "reviewsByIP": {
       ".read": true,
       ".write": false
+    },
+    "usersByIP": {
+        ".read": false,
+        ".write": false
     }
   }
 }
