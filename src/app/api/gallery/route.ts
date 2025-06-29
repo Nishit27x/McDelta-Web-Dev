@@ -12,6 +12,11 @@ const defaultGalleryImages = [
 
 export async function GET() {
   try {
+    if (!admin.apps.length) {
+      console.warn("Firebase Admin not initialized, returning default gallery images.");
+      return NextResponse.json(defaultGalleryImages, { status: 200 });
+    }
+
     const db = admin.database();
     const ref = db.ref('galleryImages');
     const snapshot = await ref.once('value');

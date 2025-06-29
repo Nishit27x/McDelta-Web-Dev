@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto';
 import { cookies } from 'next/headers';
 
 const gamertagSchema = z.object({
-  gamertag: z.string().min(3).max(20),
+  gamertag: z.string().min(3, "Gamertag must be at least 3 characters.").max(20, "Gamertag cannot be longer than 20 characters."),
 });
 
 const getAdminGamertags = () => {
@@ -21,6 +21,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    if (!admin.apps.length) {
+      return NextResponse.json({ error: 'Server configuration error: Firebase Admin SDK not initialized.' }, { status: 500 });
+    }
     const db = admin.database();
     const ref = db.ref(`usersBySessionId/${sessionId}`);
     const snapshot = await ref.once('value');
@@ -44,9 +47,6 @@ export async function GET(request: NextRequest) {
     }
   } catch (error) {
     console.error('Error fetching user session:', error);
-    if ((error as any)?.code === 'app/no-app') {
-        return NextResponse.json({ error: 'Server configuration error: Firebase Admin SDK is not initialized.' }, { status: 500 });
-    }
     return NextResponse.json({ error: 'Failed to fetch user session.' }, { status: 500 });
   }
 }
@@ -64,7 +64,9 @@ export async function POST(request: NextRequest) {
 
   const validation = gamertagSchema.safeParse(body);
   if (!validation.success) {
-    return NextResponse.json({ error: validation.error.flatten().fieldErrors }, { status: 400 });
+    const errorMessages = validation.error.flatten().fieldErrors;
+    const firstError = Object.values(errorMessages).flatMap(e => e)?.[0] || "Invalid input."
+    return NextResponse.json({ error: firstError }, { status: 400 });
   }
   
   const { gamertag } = validation.data;
@@ -73,6 +75,10 @@ export async function POST(request: NextRequest) {
   const now = new Date().toISOString();
 
   try {
+    if (!admin.apps.length) {
+      return NextResponse.json({ error: 'Server configuration error: Firebase Admin SDK not initialized. Please check your environment variables.' }, { status: 500 });
+    }
+
     const db = admin.database();
     let sessionId = cookieStore.get('sessionId')?.value;
     
@@ -115,9 +121,6 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Error creating or updating user session:', error);
-    if ((error as any)?.code === 'app/no-app') {
-        return NextResponse.json({ error: 'Server configuration error: Firebase Admin SDK is not initialized. Please check your environment variables.' }, { status: 500 });
-    }
     return NextResponse.json({ error: 'Failed to create or update user session.' }, { status: 500 });
   }
 }

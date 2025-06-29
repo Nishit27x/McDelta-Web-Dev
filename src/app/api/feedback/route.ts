@@ -11,6 +11,9 @@ const feedbackSchema = z.object({
 
 export async function GET() {
   try {
+    if (!admin.apps.length) {
+      return NextResponse.json({ error: 'Server configuration error: Firebase Admin SDK not initialized.' }, { status: 500 });
+    }
     const db = admin.database();
     const ref = db.ref('reviewsBySessionId');
     const snapshot = await ref.once('value');
@@ -51,12 +54,17 @@ export async function POST(request: NextRequest) {
 
   const validation = feedbackSchema.safeParse(body);
   if (!validation.success) {
-    return NextResponse.json({ error: validation.error.flatten().fieldErrors }, { status: 400 });
+    const errorMessages = validation.error.flatten().fieldErrors;
+    const firstError = Object.values(errorMessages).flatMap(e => e)?.[0] || "Invalid input.";
+    return NextResponse.json({ error: firstError }, { status: 400 });
   }
   
   const { name, message, rating } = validation.data;
 
   try {
+    if (!admin.apps.length) {
+      return NextResponse.json({ error: 'Server configuration error: Firebase Admin SDK not initialized.' }, { status: 500 });
+    }
     const db = admin.database();
     
     // Fetch user session to get avatar
