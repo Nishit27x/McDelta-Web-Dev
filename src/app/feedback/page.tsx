@@ -57,7 +57,7 @@ function FeedbackForm({ onFeedbackSubmit }: { onFeedbackSubmit: (newReview: Revi
 
       toast({
         title: 'Thank you!',
-        description: 'Your feedback has been submitted successfully.',
+        description: result.message,
       });
       onFeedbackSubmit(result.review);
       form.reset();
