@@ -1,5 +1,3 @@
-'use server';
-
 import { type NextRequest, NextResponse } from 'next/server';
 import admin from '@/lib/firebase-admin';
 import * as z from 'zod';
@@ -46,6 +44,9 @@ export async function GET(request: NextRequest) {
     }
   } catch (error) {
     console.error('Error fetching user session:', error);
+    if ((error as any)?.code === 'app/no-app') {
+        return NextResponse.json({ error: 'Server configuration error: Firebase Admin SDK is not initialized.' }, { status: 500 });
+    }
     return NextResponse.json({ error: 'Failed to fetch user session.' }, { status: 500 });
   }
 }
@@ -53,7 +54,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const cookieStore = cookies();
-  let sessionId = cookieStore.get('sessionId')?.value;
 
   let body;
   try {
@@ -70,58 +70,54 @@ export async function POST(request: NextRequest) {
   const { gamertag } = validation.data;
   const adminGamertags = getAdminGamertags();
   const isAdmin = adminGamertags.includes(gamertag.toLowerCase());
+  const now = new Date().toISOString();
 
   try {
     const db = admin.database();
-    const now = new Date().toISOString();
-    let userData;
-    let statusCode = 200;
-
-    let sessionExistsInDb = false;
-    if (sessionId) {
-        const ref = db.ref(`usersBySessionId/${sessionId}`);
-        const snapshot = await ref.once('value');
-        if (snapshot.exists()) {
-            sessionExistsInDb = true;
-            const existingData = snapshot.val();
-            const updatedData = {
-                gamertag: gamertag,
-                lastSeen: now,
-            };
-            await ref.update(updatedData);
-            userData = { ...existingData, ...updatedData };
-        }
-    }
-
-    if (!sessionExistsInDb) {
-      // New user or invalid session, create a new one
-      const newSessionId = randomUUID();
-      const crafatarId = randomUUID();
-      userData = {
-        gamertag,
-        avatar: `https://crafatar.com/avatars/${crafatarId}?overlay`,
-        createdAt: now,
-        lastSeen: now,
-      };
-      await db.ref(`usersBySessionId/${newSessionId}`).set(userData);
-      
-      cookieStore.set('sessionId', newSessionId, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV !== 'development',
-        path: '/',
-        maxAge: 60 * 60 * 24 * 365, // 1 year
-      });
-      statusCode = 201;
-    }
+    let sessionId = cookieStore.get('sessionId')?.value;
     
-    const responseData = {
-        ...userData,
-        isAdmin: isAdmin,
-    };
+    // Path 1: A session ID already exists in the cookie.
+    if (sessionId) {
+      const userRef = db.ref(`usersBySessionId/${sessionId}`);
+      const snapshot = await userRef.once('value');
 
-    return NextResponse.json(responseData, { status: statusCode });
+      // If the user exists for that session, update their gamertag and lastSeen.
+      if (snapshot.exists()) {
+        const updatedData = { gamertag, lastSeen: now };
+        await userRef.update(updatedData);
+        
+        const responseData = { ...snapshot.val(), ...updatedData, isAdmin };
+        return NextResponse.json(responseData, { status: 200 });
+      }
+    }
+
+    // Path 2: No valid session found. Create a new one.
+    const newSessionId = randomUUID();
+    const crafatarId = randomUUID();
+    const newUser = {
+      gamertag,
+      avatar: `https://crafatar.com/avatars/${crafatarId}?overlay`,
+      createdAt: now,
+      lastSeen: now,
+    };
+    
+    await db.ref(`usersBySessionId/${newSessionId}`).set(newUser);
+
+    cookieStore.set('sessionId', newSessionId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== 'development',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+    });
+    
+    const responseData = { ...newUser, isAdmin };
+    return NextResponse.json(responseData, { status: 201 });
+
   } catch (error) {
     console.error('Error creating or updating user session:', error);
-    return NextResponse.json({ error: 'Failed to save user session.' }, { status: 500 });
+    if ((error as any)?.code === 'app/no-app') {
+        return NextResponse.json({ error: 'Server configuration error: Firebase Admin SDK is not initialized. Please check your environment variables.' }, { status: 500 });
+    }
+    return NextResponse.json({ error: 'Failed to create or update user session.' }, { status: 500 });
   }
 }
