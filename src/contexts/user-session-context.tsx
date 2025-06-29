@@ -1,8 +1,6 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import SignInModal from '@/components/sign-in-modal';
-import { Skeleton } from '@/components/ui/skeleton';
 
 interface UserSession {
   gamertag: string;
@@ -31,7 +29,6 @@ export function useUserSession() {
 export function UserSessionProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<UserSession | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showSignInModal, setShowSignInModal] = useState(false);
 
   const fetchSession = useCallback(async () => {
     setIsLoading(true);
@@ -40,18 +37,12 @@ export function UserSessionProvider({ children }: { children: React.ReactNode })
       if (response.ok) {
         const data = await response.json();
         setSession(data);
-        setShowSignInModal(false);
       } else {
-        // For any non-ok response (e.g., 404 Not Found, 500 Server Error),
-        // we assume no session exists and show the sign-in modal.
-        // This prevents the console error from appearing for 500s.
-        setShowSignInModal(true);
+        setSession(null);
       }
     } catch (error) {
-      // This will catch network errors or other issues with the fetch itself.
       console.error('Network error while fetching user session:', error);
-      // Fallback to showing the sign-in modal.
-      setShowSignInModal(true);
+      setSession(null);
     } finally {
       setIsLoading(false);
     }
@@ -60,28 +51,10 @@ export function UserSessionProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     fetchSession();
   }, [fetchSession]);
-  
-  const handleSignInSuccess = (newSession: UserSession) => {
-    setSession(newSession);
-    setShowSignInModal(false);
-    setIsLoading(false);
-  };
-
-  if (isLoading) {
-      return (
-          <div className="w-full h-dvh flex items-center justify-center">
-              <Skeleton className="w-48 h-12" />
-          </div>
-      )
-  }
 
   return (
     <UserSessionContext.Provider value={{ session, isLoading, refetch: fetchSession }}>
-      {showSignInModal ? (
-        <SignInModal onSuccess={handleSignInSuccess} />
-      ) : (
-        children
-      )}
+      {children}
     </UserSessionContext.Provider>
   );
 }

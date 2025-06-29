@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import React, { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUserSession } from "@/contexts/user-session-context";
+import SignInModal from "@/components/sign-in-modal";
 
 const feedbackSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters.").max(50),
@@ -49,7 +50,7 @@ export default function Feedback() {
   const { toast } = useToast();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoadingReviews, setIsLoadingReviews] = useState(true);
-  const { session, isLoading: isLoadingSession } = useUserSession();
+  const { session, isLoading: isLoadingSession, refetch } = useUserSession();
 
   const form = useForm<z.infer<typeof feedbackSchema>>({
     resolver: zodResolver(feedbackSchema),
@@ -110,8 +111,15 @@ export default function Feedback() {
     }
   }
 
+  const handleSignInSuccess = () => {
+    refetch();
+  };
+
+  const shouldShowSignIn = !isLoadingSession && !session;
+
   return (
     <section id="feedback" className="py-16 md:py-24">
+      {shouldShowSignIn && <SignInModal onSuccess={handleSignInSuccess} />}
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold">Player Feedback</h2>
@@ -129,7 +137,7 @@ export default function Feedback() {
                     <Skeleton className="h-24 w-full" />
                     <Skeleton className="h-10 w-32" />
                 </div>
-              ) : (
+              ) : session ? (
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <FormField
@@ -172,6 +180,10 @@ export default function Feedback() {
                     </Button>
                   </form>
                 </Form>
+              ) : (
+                <div className="flex items-center justify-center h-48 text-muted-foreground">
+                    <p>Please sign in to leave feedback.</p>
+                </div>
               )}
             </CardContent>
           </Card>
