@@ -176,7 +176,7 @@ export default function AdminPage() {
     e.preventDefault();
     const correctUsername = 'ADMINDELTA';
     const correctPassword = 'delta@admin';
-    const correctPattern = [1, 4, 7]; // ']' shape: top-right, middle-right, bottom-right
+    const correctPattern = [2, 5, 8]; // ']' shape: top-right, middle-right, bottom-right
 
     const isPatternCorrect =
       pattern.length === correctPattern.length &&
