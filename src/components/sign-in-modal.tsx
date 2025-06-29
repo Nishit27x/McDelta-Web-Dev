@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -16,9 +16,10 @@ const signInSchema = z.object({
 
 interface SignInModalProps {
   onSuccess: (session: any) => void;
+  onCancel: () => void;
 }
 
-export default function SignInModal({ onSuccess }: SignInModalProps) {
+export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -62,12 +63,12 @@ export default function SignInModal({ onSuccess }: SignInModalProps) {
   }
 
   return (
-    <Dialog open={true} modal={true}>
-      <DialogContent className="sm:max-w-[425px]" onInteractOutside={(e) => e.preventDefault()}>
+    <Dialog open={true} onOpenChange={(isOpen) => !isOpen && onCancel()}>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Welcome to McDelta SMP</DialogTitle>
+          <DialogTitle>Sign In to Leave Feedback</DialogTitle>
           <DialogDescription>
-            It looks like this is your first time visiting. Please enter your Minecraft Gamertag to continue.
+            Please enter your Minecraft Gamertag. This is only required once.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -85,9 +86,14 @@ export default function SignInModal({ onSuccess }: SignInModalProps) {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save and Continue'}
-            </Button>
+            <DialogFooter className="pt-4">
+              <Button type="button" variant="outline" onClick={onCancel}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : 'Save and Continue'}
+              </Button>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>

@@ -16,6 +16,7 @@ import React, { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUserSession } from "@/contexts/user-session-context";
 import SignInModal from "@/components/sign-in-modal";
+import { useRouter } from "next/navigation";
 
 const feedbackSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters.").max(50),
@@ -47,10 +48,12 @@ function StarRating({ value, onChange }: { value: number; onChange: (value: numb
 }
 
 export default function Feedback() {
+  const router = useRouter();
   const { toast } = useToast();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoadingReviews, setIsLoadingReviews] = useState(true);
   const { session, isLoading: isLoadingSession, refetch } = useUserSession();
+  const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
 
   const form = useForm<z.infer<typeof feedbackSchema>>({
     resolver: zodResolver(feedbackSchema),
@@ -82,6 +85,12 @@ export default function Feedback() {
     }
   }, [session, form]);
 
+  useEffect(() => {
+    if (!isLoadingSession && !session) {
+      setIsSignInModalOpen(true);
+    }
+  }, [isLoadingSession, session]);
+
   async function onSubmit(values: z.infer<typeof feedbackSchema>) {
     try {
       const response = await fetch('/api/feedback', {
@@ -112,14 +121,18 @@ export default function Feedback() {
   }
 
   const handleSignInSuccess = () => {
+    setIsSignInModalOpen(false);
     refetch();
   };
 
-  const shouldShowSignIn = !isLoadingSession && !session;
+  const handleCancelSignIn = () => {
+    setIsSignInModalOpen(false);
+    router.push('/');
+  };
 
   return (
     <section id="feedback" className="py-16 md:py-24">
-      {shouldShowSignIn && <SignInModal onSuccess={handleSignInSuccess} />}
+      {isSignInModalOpen && <SignInModal onSuccess={handleSignInSuccess} onCancel={handleCancelSignIn} />}
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold">Player Feedback</h2>
