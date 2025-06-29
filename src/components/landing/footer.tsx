@@ -42,10 +42,10 @@ export default function Footer() {
           <nav className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm font-medium">
             <Link href="/" className="text-muted-foreground hover:text-accent transition-colors">Home</Link>
             <Link href="/#features" className="text-muted-foreground hover:text-accent transition-colors">Features</Link>
-            <Link href="/#gallery" className="text-muted-foreground hover:text-accent transition-colors">Gallery</Link>
+            <Link href="/gallery" className="text-muted-foreground hover:text-accent transition-colors">Gallery</Link>
             <Link href="/rules" className="text-muted-foreground hover:text-accent transition-colors">Rules</Link>
             <Link href="/status" className="text-muted-foreground hover:text-accent transition-colors">Player Status</Link>
-            <Link href="/#feedback" className="text-muted-foreground hover:text-accent transition-colors">Feedback</Link>
+            <Link href="/feedback" className="text-muted-foreground hover:text-accent transition-colors">Feedback</Link>
             <Link href="/#join" className="text-muted-foreground hover:text-accent transition-colors">Join</Link>
           </nav>
           <div className="flex items-center space-x-4 justify-center md:justify-end">

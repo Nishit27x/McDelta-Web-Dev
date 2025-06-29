@@ -41,10 +41,10 @@ export default function Header() {
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
           <Link href="/" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Home</Link>
           <Link href="/#features" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Features</Link>
-          <Link href="/#gallery" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Gallery</Link>
+          <Link href="/gallery" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Gallery</Link>
           <Link href="/rules" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Rules</Link>
           <Link href="/status" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Player Status</Link>
-          <Link href="/#feedback" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Feedback</Link>
+          <Link href="/feedback" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Feedback</Link>
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-2">
           <Button asChild>
@@ -65,10 +65,10 @@ export default function Header() {
                 </div>
                 <Link href="/" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Home</Link>
                 <Link href="/#features" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Features</Link>
-                <Link href="/#gallery" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Gallery</Link>
+                <Link href="/gallery" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Gallery</Link>
                 <Link href="/rules" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Rules</Link>
                 <Link href="/status" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Player Status</Link>
-                <Link href="/#feedback" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Feedback</Link>
+                <Link href="/feedback" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Feedback</Link>
                 <Link href="/#join" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Join</Link>
               </nav>
             </SheetContent>
