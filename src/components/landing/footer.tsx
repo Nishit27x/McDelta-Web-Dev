@@ -25,9 +25,10 @@ export default function Footer() {
         <div className="grid md:grid-cols-3 gap-8 items-center">
           <div className="flex items-center space-x-2 justify-center md:justify-start">
             <DiamondIcon className="h-6 w-6 text-accent" />
-            <Link href="/" className="font-bold font-jokerman">McDelta SMP</Link>
+            <span className="font-bold font-jokerman">McDelta SMP</span>
           </div>
           <nav className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm font-medium">
+            <Link href="/" className="text-muted-foreground hover:text-accent transition-colors">Home</Link>
             <Link href="/#features" className="text-muted-foreground hover:text-accent transition-colors">Features</Link>
             <Link href="/#gallery" className="text-muted-foreground hover:text-accent transition-colors">Gallery</Link>
             <Link href="/rules" className="text-muted-foreground hover:text-accent transition-colors">Rules</Link>

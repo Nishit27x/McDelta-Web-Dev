@@ -32,13 +32,14 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
+        <div className="mr-6 flex items-center space-x-2">
           <DiamondIcon className="h-8 w-8" />
           <span className="hidden font-bold sm:inline-block font-jokerman text-lg">
             McDelta SMP
           </span>
-        </Link>
+        </div>
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <Link href="/" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Home</Link>
           <Link href="/#features" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Features</Link>
           <Link href="/#gallery" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Gallery</Link>
           <Link href="/rules" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Rules</Link>
@@ -76,10 +77,11 @@ export default function Header() {
             </SheetTrigger>
             <SheetContent side="right">
               <nav className="grid gap-6 text-lg font-medium pt-10">
-                <Link href="/" className="flex items-center gap-2 text-lg font-semibold mb-4">
+                <div className="flex items-center gap-2 text-lg font-semibold mb-4">
                   <DiamondIcon className="h-6 w-6 text-accent" />
                   <span className="font-jokerman">McDelta SMP</span>
-                </Link>
+                </div>
+                <Link href="/" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Home</Link>
                 <Link href="/#features" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Features</Link>
                 <Link href="/#gallery" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Gallery</Link>
                 <Link href="/rules" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Rules</Link>
