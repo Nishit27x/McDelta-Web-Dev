@@ -9,8 +9,15 @@ const feedbackSchema = z.object({
 });
 
 function getIp(request: NextRequest) {
-    const ip = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim();
-    if (!ip) return 'unknown';
+    let ip = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim();
+    if (!ip) {
+      // Fallback for local development where IP might not be available
+      if (process.env.NODE_ENV === 'development') {
+        ip = '127.0.0.1'; // Use a mock IP for dev
+      } else {
+        return 'unknown';
+      }
+    }
     // Sanitize IP to use as a Firebase key
     return ip.replace(/\./g, '_').replace(/:/g, '_');
 }
