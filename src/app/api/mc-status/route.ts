@@ -12,7 +12,7 @@ export async function GET() {
   try {
     const response = await query(serverConfig.host, serverConfig.port, {
       timeout: 5000,
-      enableSRV: true,
+      enableSRV: false,
     });
 
     const data = {
