@@ -151,7 +151,7 @@ export default function RulesPage() {
             Rules
           </h2>
           <p className="text-lg text-muted-foreground mt-8 max-w-3xl mx-auto">
-            To foster community growth and reward initiative, these guidelines govern our server. Please read them carefully.
+            These guidelines govern our server, please read them carefully.
           </p>
         </div>
 
