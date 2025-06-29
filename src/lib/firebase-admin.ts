@@ -10,19 +10,28 @@
 
 import admin from 'firebase-admin';
 
-if (!admin.apps.length) {
+const hasFirebaseAdminConfig = 
+    process.env.FIREBASE_PROJECT_ID &&
+    process.env.FIREBASE_CLIENT_EMAIL &&
+    process.env.FIREBASE_PRIVATE_KEY;
+
+if (hasFirebaseAdminConfig && !admin.apps.length) {
   try {
     admin.initializeApp({
       credential: admin.credential.cert({
         projectId: process.env.FIREBASE_PROJECT_ID,
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
       }),
       databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
     });
   } catch (error) {
     console.error('Firebase admin initialization error', error);
   }
+} else if (!hasFirebaseAdminConfig) {
+    console.warn(
+        'Firebase Admin credentials are not set in .env.local. Skipping initialization. Some API routes may not work.'
+    );
 }
 
 export default admin;
