@@ -16,7 +16,6 @@ function isFirebaseAdminInitialized() {
 export async function GET() {
   if (!isFirebaseAdminInitialized()) {
     // Return empty array if Firebase is not configured, so the page doesn't break.
-    // The form will show an error on POST if they try to submit.
     return NextResponse.json([], { status: 200 });
   }
 
@@ -43,10 +42,6 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  if (!isFirebaseAdminInitialized()) {
-    return NextResponse.json({ error: 'Server configuration error: The feedback system is currently unavailable.' }, { status: 500 });
-  }
-
   let body;
   try {
     body = await request.json();
@@ -63,12 +58,28 @@ export async function POST(request: NextRequest) {
   
   const { name, message, rating } = validation.data;
 
+  // If Firebase isn't configured, we'll simulate a successful submission for development purposes.
+  if (!isFirebaseAdminInitialized()) {
+    console.warn("Firebase Admin not configured. Simulating feedback submission.");
+    const mockReview = {
+        id: new Date().toISOString(),
+        name,
+        message,
+        rating,
+        avatar: `https://crafatar.com/avatars/${name}?overlay`,
+        createdAt: Date.now(),
+    };
+    return NextResponse.json({ 
+        message: 'Feedback submitted successfully! (This is a demo, data was not saved)', 
+        review: mockReview 
+    }, { status: 201 });
+  }
+
+  // If Firebase IS configured, proceed to save the data to the database.
   try {
     const db = admin.database();
     const ref = db.ref('reviews');
     
-    // We'll use the gamertag to try and fetch an avatar from Crafatar
-    // This is not guaranteed to be a real player UUID, but Crafatar has fallbacks.
     const newReview = {
         name,
         message,
