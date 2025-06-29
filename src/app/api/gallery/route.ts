@@ -1,15 +1,30 @@
 import { NextResponse } from 'next/server';
+import admin from '@/lib/firebase-admin';
 
-const defaultGalleryImages = [
-  { src: 'https://placehold.co/600x400.png', alt: 'Spawn Area', tag: 'Spawn Area', hint: 'minecraft spawn' },
-  { src: 'https://placehold.co/600x401.png', alt: 'PvP Zone', tag: 'PvP Zone', hint: 'minecraft pvp' },
-  { src: 'https://placehold.co/600x402.png', alt: 'Epic Base Build', tag: 'Player Build', hint: 'minecraft base' },
-  { src: 'https://placehold.co/600x403.png', alt: 'Nether Hub', tag: 'Infrastructure', hint: 'minecraft nether' },
-  { src: 'https://placehold.co/600x404.png', alt: 'Community Farm', tag: 'Community', hint: 'minecraft farm' },
-  { src: 'https://placehold.co/600x405.png', alt: 'Quest Giver Village', tag: 'Quests', hint: 'minecraft village' },
-];
-
+// This function now fetches gallery images from the Firebase Realtime Database.
 export async function GET() {
-  // Returns a static list of images to avoid dependency on Firebase DB
-  return NextResponse.json(defaultGalleryImages, { status: 200 });
+  if (admin.apps.length === 0) {
+    return NextResponse.json({ error: 'Firebase Admin not initialized.' }, { status: 503 });
+  }
+
+  try {
+    const db = admin.database();
+    const ref = db.ref('galleryImages');
+    const snapshot = await ref.orderByChild('createdAt').once('value');
+
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      // Convert the object of objects into an array and sort by creation date descending
+      const images = Object.keys(data)
+        .map(key => ({ id: key, ...data[key] }))
+        .sort((a, b) => b.createdAt - a.createdAt);
+      return NextResponse.json(images);
+    } else {
+      // If no images exist in the database, return an empty array.
+      return NextResponse.json([]);
+    }
+  } catch (error) {
+    console.error('Error fetching gallery images from Firebase:', error);
+    return NextResponse.json({ error: 'Failed to fetch gallery images.' }, { status: 500 });
+  }
 }

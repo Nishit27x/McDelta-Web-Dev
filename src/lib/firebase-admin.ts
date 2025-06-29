@@ -6,14 +6,15 @@
 // FIREBASE_CLIENT_EMAIL="firebase-adminsdk-.....@your-project-id.iam.gserviceaccount.com"
 // FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n.....\n-----END PRIVATE KEY-----\n"
 // NEXT_PUBLIC_FIREBASE_DATABASE_URL="https://your-project-id-default-rtdb.firebaseio.com"
-//
+// NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="your-project-id.appspot.com"
 
 import admin from 'firebase-admin';
 
 const hasFirebaseAdminConfig = 
     process.env.FIREBASE_PROJECT_ID &&
     process.env.FIREBASE_CLIENT_EMAIL &&
-    process.env.FIREBASE_PRIVATE_KEY;
+    process.env.FIREBASE_PRIVATE_KEY &&
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
 
 if (hasFirebaseAdminConfig && !admin.apps.length) {
   try {
@@ -24,13 +25,14 @@ if (hasFirebaseAdminConfig && !admin.apps.length) {
         privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
       }),
       databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
     });
   } catch (error) {
     console.error('Firebase admin initialization error', error);
   }
 } else if (!hasFirebaseAdminConfig) {
     console.warn(
-        'Firebase Admin credentials are not set in .env.local. Skipping initialization. Some API routes may not work.'
+        'Firebase Admin credentials (including storage bucket) are not set in .env.local. Skipping initialization. Some API routes may not work.'
     );
 }
 
