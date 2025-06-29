@@ -5,7 +5,7 @@ export const revalidate = 60; // Revalidate every 60 seconds
 
 const serverConfig = {
   host: 'paid-1.guardxhosting.in',
-  port: 25501, // Query port
+  port: 25565, // Query port
 };
 
 export async function GET() {
