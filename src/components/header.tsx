@@ -34,7 +34,7 @@ export default function Header() {
           <Link href="/#features" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Features</Link>
           <Link href="/gallery" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Gallery</Link>
           <Link href="/rules" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Rules</Link>
-          <Link href="/status" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Player Status</Link>
+          <Link href="/status" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Server Status</Link>
           <Link href="/feedback" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Feedback</Link>
           <Link href="/admin" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Admin</Link>
         </nav>
@@ -62,7 +62,7 @@ export default function Header() {
                 <Link href="/#features" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Features</Link>
                 <Link href="/gallery" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Gallery</Link>
                 <Link href="/rules" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Rules</Link>
-                <Link href="/status" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Player Status</Link>
+                <Link href="/status" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Server Status</Link>
                 <Link href="/feedback" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Feedback</Link>
                 <Link href="/admin" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Admin</Link>
                 <a href="https://discord.gg/kSE8qCUY" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">Join</a>
