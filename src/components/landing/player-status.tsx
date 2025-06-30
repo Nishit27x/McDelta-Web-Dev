@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -31,8 +32,10 @@ export default function PlayerStatus() {
         const res = await fetch('/api/mc-status');
         const data: ServerStatus = await res.json();
         if (data && Array.isArray(data.players)) {
-          // Filter out players who might not have a name or id to prevent crashes
-          const validPlayers = data.players.filter(p => p && p.name && p.id);
+          // Agressively filter out any malformed player objects to prevent crashes.
+          const validPlayers = data.players.filter(
+            p => p && typeof p.name === 'string' && p.name.length > 0 && typeof p.id === 'string'
+          );
           setOnlinePlayers(validPlayers.sort((a, b) => a.name.localeCompare(b.name)));
           setTotalOnline(data.online);
         } else {
@@ -53,16 +56,16 @@ export default function PlayerStatus() {
     return () => clearInterval(interval);
   }, []);
 
-  const getAvatarUrl = (player: Player) => {
-    // Determine the default skin (Steve or Alex) based on the player's name for consistency.
-    const nameHash = player.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const getAvatarUrl = (playerName: string) => {
+    // This function is now safer and only depends on the name.
+    const nameHash = playerName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const defaultSkin = nameHash % 2 === 0 ? 'steve' : 'alex';
-
-    // Always use the player's name for the avatar lookup.
-    // It's unique on the server and Crafatar provides a default (Steve/Alex) if a custom skin isn't found.
-    // This is more reliable than trying to differentiate between Java UUIDs and Bedrock XUIDs.
-    const cleanName = player.name.startsWith('.') ? player.name.substring(1) : player.name;
     
+    // Bedrock players on Geyser have a '.' prefix, which Crafatar doesn't want.
+    const cleanName = playerName.startsWith('.') ? playerName.substring(1) : playerName;
+    
+    // We use the player's name as the identifier. Crafatar will find the skin
+    // and use the default if a custom skin isn't found. This is reliable.
     return `https://crafatar.com/avatars/${encodeURIComponent(cleanName)}?overlay&default=${defaultSkin}`;
   };
 
@@ -71,6 +74,7 @@ export default function PlayerStatus() {
       return onlinePlayers;
     }
     return onlinePlayers.filter((player) =>
+      // We know player.name is a string here because of the filter in useEffect
       player.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [onlinePlayers, searchTerm]);
@@ -101,13 +105,13 @@ export default function PlayerStatus() {
             {filteredPlayers.length > 0 ? (
                 <ul className="space-y-3">
                 {filteredPlayers.map((player) => {
-                    // Clean name for display and for fallback avatar text
+                    // This mapping is now safe because we filtered invalid players in useEffect.
                     const cleanName = player.name.startsWith('.') ? player.name.substring(1) : player.name;
                     return (
                     <li key={player.id} className="flex items-center justify-between p-3 rounded-md bg-background/50">
                         <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10 border-2 border-primary/50">
-                                <AvatarImage src={getAvatarUrl(player)} alt={`${cleanName}'s skin`} />
+                                <AvatarImage src={getAvatarUrl(player.name)} alt={`${cleanName}'s skin`} />
                                 <AvatarFallback>{cleanName.charAt(0).toUpperCase()}</AvatarFallback>
                             </Avatar>
                             <span className="font-medium">{cleanName}</span>
