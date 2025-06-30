@@ -6,7 +6,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Copy } from "lucide-react";
 import DiscordIcon from "../icons/discord-icon";
-import ServerStatusCards from "../server-status-cards";
 
 export default function Join() {
   const { toast } = useToast();
@@ -60,9 +59,6 @@ export default function Join() {
               Join our Discord
             </a>
           </Button>
-        </div>
-        <div className="mt-12">
-            <ServerStatusCards />
         </div>
       </div>
     </section>

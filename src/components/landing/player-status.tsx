@@ -5,7 +5,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search } from 'lucide-react';
-import ServerStatusCards from '../server-status-cards';
 
 interface ServerStatus {
   online: number;
@@ -59,12 +58,8 @@ export default function PlayerStatus() {
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold">Server Status</h2>
           <p className="text-lg text-muted-foreground mt-2 max-w-2xl mx-auto">
-            See who's online, check server uptime, and search for other players.
+            See who's online and search for players.
           </p>
-        </div>
-
-        <div className="mb-12">
-          <ServerStatusCards />
         </div>
 
         <Card className="max-w-3xl mx-auto bg-card/80 backdrop-blur-sm">
