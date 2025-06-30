@@ -48,7 +48,7 @@ export default function CreditsPage() {
                           <AvatarImage src={person.avatar} alt={`${person.name}'s avatar`} />
                           <AvatarFallback>{person.name.charAt(0)}</AvatarFallback>
                         </Avatar>
-                        <h4 className="font-bold text-xl mt-2">{person.name}</h4>
+                        <h4 className="font-headline font-bold text-2xl mt-4 bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-cyan-400 drop-shadow-sm">{person.name}</h4>
                     </div>
                 ))}
             </div>
