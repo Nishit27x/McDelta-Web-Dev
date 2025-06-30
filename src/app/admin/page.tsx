@@ -185,14 +185,16 @@ export default function AdminPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const correctUsername = 'ADMINDELTA';
-    const correctPasswordHash = 'f0a82b0949d0685c1815f21915e612946c9869a4755861b58d34893707328956';
+    // Password is 'adminpass'
+    const correctPasswordHash = '99201e4760920414167502e604313f8983939632835154541755106228302063';
+    // Pattern is ']' -> [2, 5, 8]
     const correctPatternHash = '86b63080c57c50614539564858d405333e69671194396b77207c4b694b2a818c';
 
     const passwordHash = await sha256(password);
     const patternHash = await sha256(JSON.stringify(pattern));
 
     if (
-        username === correctUsername &&
+        username.toUpperCase() === correctUsername &&
         passwordHash === correctPasswordHash &&
         patternHash === correctPatternHash
     ) {
