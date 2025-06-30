@@ -187,7 +187,7 @@ export default function AdminPage() {
     e.preventDefault();
     const correctUsername = 'ADMINDELTA';
     // Password is 'adminpass'
-    const correctPasswordHash = '99201e4760920414167502e604313f8983939632835154541755106228302063';
+    const correctPasswordHash = 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3';
     // Pattern is ']' -> [2, 5, 8]
     const correctPatternHash = '86b63080c57c50614539564858d405333e69671194396b77207c4b694b2a818c';
 
