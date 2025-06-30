@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const credits = [
     {
         name: "LegendHacker27",
-        avatar: "https://crafatar.com/avatars/Herobrine?overlay"
+        avatar: "https://crafatar.com/avatars/MHF_Herobrine?overlay"
     },
     {
         name: "Tobbler_",
