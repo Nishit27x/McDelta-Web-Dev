@@ -1,9 +1,11 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search } from 'lucide-react';
+import ServerStatusCards from '../server-status-cards';
 
 interface ServerStatus {
   online: number;
@@ -19,6 +21,7 @@ export default function PlayerStatus() {
 
   useEffect(() => {
     const fetchStatus = async () => {
+      setLoading(true);
       try {
         const res = await fetch('/api/mc-status');
         const data: ServerStatus = await res.json();
@@ -54,16 +57,21 @@ export default function PlayerStatus() {
     <section className="py-16 md:py-24 bg-background/50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold">Player Status</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">Server Status</h2>
           <p className="text-lg text-muted-foreground mt-2 max-w-2xl mx-auto">
-            Search for players and see who is currently online.
+            See who's online, check server uptime, and search for other players.
           </p>
         </div>
-        <Card className="max-w-2xl mx-auto bg-card/80 backdrop-blur-sm">
+
+        <div className="mb-12">
+          <ServerStatusCards />
+        </div>
+
+        <Card className="max-w-3xl mx-auto bg-card/80 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Search className="w-6 h-6" />
-              <span>Search Online Players</span>
+              <span>Search Online Players ({onlinePlayers.length})</span>
             </CardTitle>
             <div className="relative mt-4">
               <Input
