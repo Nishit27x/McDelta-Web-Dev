@@ -9,19 +9,19 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const credits = [
     {
         name: "LegendHacker27",
-        avatar: "https://crafatar.com/avatars/f8cdb682-1457-4252-a430-5b8a61388914?overlay" // Herobrine
+        avatar: "https://crafatar.com/avatars/f8cdb682-1457-4252-a430-5b8a61388914?overlay"
     },
     {
         name: "Tobbler_",
-        avatar: "https://crafatar.com/avatars/00bb0364-c48f-4217-a9a3-7c369e431f79?overlay" // Zuri
+        avatar: "https://crafatar.com/avatars/f8cdb682-1457-4252-a430-5b8a61388914?overlay"
     },
     {
         name: "VaibhavOp345",
-        avatar: "https://crafatar.com/avatars/8667ba71-b85a-4004-af54-457a9734eed7?overlay" // Steve
+        avatar: "https://crafatar.com/avatars/f8cdb682-1457-4252-a430-5b8a61388914?overlay"
     },
     {
         name: "Mrkiller0033",
-        avatar: "https://crafatar.com/avatars/6ab43178-89fd-4903-9993-1383aaaa5853?overlay" // Alex
+        avatar: "https://crafatar.com/avatars/f8cdb682-1457-4252-a430-5b8a61388914?overlay"
     }
 ];
 
