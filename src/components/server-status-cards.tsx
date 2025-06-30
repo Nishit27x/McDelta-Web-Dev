@@ -3,9 +3,20 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Users, Signal, ServerOff } from "lucide-react";
+import { Users, Signal, ServerOff, Power } from "lucide-react";
 
 interface ServerStatus {
   online: number;
@@ -76,20 +87,44 @@ export default function ServerStatusCards() {
       </TooltipProvider>
 
       <Card className="h-full">
-          <CardContent className="p-4 flex items-center gap-4">
-              {loading ? (
-                  <Signal className="w-8 h-8 text-muted-foreground animate-pulse" />
-              ) : isServerOnline ? (
-                  <Signal className="w-8 h-8 text-online" />
-              ) : (
-                  <ServerOff className="w-8 h-8 text-destructive" />
-              )}
-              <div>
-                  <p className="font-bold text-2xl">
-                    {loading ? 'Pinging...' : isServerOnline ? <span className="text-online">Online</span> : <span className="text-destructive">Offline</span>}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Server Status</p>
+          <CardContent className="p-4 flex flex-col justify-between h-full">
+              <div className="flex items-center gap-4">
+                  {loading ? (
+                      <Signal className="w-8 h-8 text-muted-foreground animate-pulse" />
+                  ) : isServerOnline ? (
+                      <Signal className="w-8 h-8 text-online" />
+                  ) : (
+                      <ServerOff className="w-8 h-8 text-destructive" />
+                  )}
+                  <div>
+                      <p className="font-bold text-2xl">
+                        {loading ? 'Pinging...' : isServerOnline ? <span className="text-online">Online</span> : <span className="text-destructive">Offline</span>}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Server Status</p>
+                  </div>
               </div>
+              
+              {!loading && !isServerOnline && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button className="w-full">
+                        <Power className="mr-2 h-4 w-4" />
+                        Request Start Server
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Coming Soon!</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This feature is currently under development. For now, please ask an admin on Discord to start the server.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogAction>Got it</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
           </CardContent>
       </Card>
     </div>
