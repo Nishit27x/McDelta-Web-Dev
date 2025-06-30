@@ -18,7 +18,7 @@ export async function GET() {
     const data = {
       online: response.players.online,
       max: response.players.max,
-      players: response.players.sample ? response.players.sample.map(p => p.name) : [],
+      players: response.players.sample ? response.players.sample.map(p => ({ name: p.name, id: p.id })) : [],
     };
 
     return NextResponse.json(data);
