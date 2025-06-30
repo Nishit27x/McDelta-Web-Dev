@@ -31,6 +31,7 @@ export default function ServerStatusCards() {
 
   useEffect(() => {
     const fetchStatus = async () => {
+      setLoading(true);
       try {
         const res = await fetch('/api/mc-status');
         const data = await res.json();
@@ -104,27 +105,36 @@ export default function ServerStatusCards() {
                   </div>
               </div>
               
-              {!loading && !isServerOnline && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button className="w-full">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <Button className="w-full mt-4" disabled={loading}>
                         <Power className="mr-2 h-4 w-4" />
-                        Request Start Server
+                         {loading ? 'Checking Status...' : 'Request Start Server'}
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Coming Soon!</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This feature is currently under development. For now, please ask an admin on Discord to start the server.
-                      </AlertDialogDescription>
+                       {isServerOnline ? (
+                         <>
+                            <AlertDialogTitle>Server is already online</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                You can now join the server.
+                            </AlertDialogDescription>
+                         </>
+                       ) : (
+                         <>
+                            <AlertDialogTitle>Out of Service</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This feature is currently out of service, will be back soon.
+                            </AlertDialogDescription>
+                         </>
+                       )}
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogAction>Got it</AlertDialogAction>
+                        <AlertDialogAction>Got it</AlertDialogAction>
                     </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              )}
+                </AlertDialogContent>
+              </AlertDialog>
           </CardContent>
       </Card>
     </div>
