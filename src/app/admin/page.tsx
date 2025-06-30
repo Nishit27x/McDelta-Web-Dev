@@ -13,6 +13,16 @@ import { useToast } from '@/hooks/use-toast';
 import { Construction, ArrowLeft, ShieldAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// Hashes a string using the SHA-256 algorithm.
+async function sha256(str: string): Promise<string> {
+    const buffer = new TextEncoder().encode(str);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+
+
 // Helper component for the pattern lock UI
 const PatternLock = ({ onComplete, resetKey }: { onComplete: (pattern: number[]) => void, resetKey: number }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -172,17 +182,20 @@ export default function AdminPage() {
   const [view, setView] = useState<'login' | 'success' | 'error'>('login');
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const correctUsername = 'ADMINDELTA';
-    const correctPassword = 'delta@admin';
-    const correctPattern = [2, 5, 8]; // ']' shape: top-right, middle-right, bottom-right
+    const correctPasswordHash = 'f0a82b0949d0685c1815f21915e612946c9869a4755861b58d34893707328956';
+    const correctPatternHash = '86b63080c57c50614539564858d405333e69671194396b77207c4b694b2a818c';
 
-    const isPatternCorrect =
-      pattern.length === correctPattern.length &&
-      pattern.every((val, index) => val === correctPattern[index]);
+    const passwordHash = await sha256(password);
+    const patternHash = await sha256(JSON.stringify(pattern));
 
-    if (username === correctUsername && password === correctPassword && isPatternCorrect) {
+    if (
+        username === correctUsername &&
+        passwordHash === correctPasswordHash &&
+        patternHash === correctPatternHash
+    ) {
       setView('success');
       toast({ title: 'Access Granted', description: 'Welcome, Admin!' });
     } else {
