@@ -30,10 +30,6 @@ if (hasFirebaseAdminConfig && !admin.apps.length) {
   } catch (error) {
     console.error('Firebase admin initialization error', error);
   }
-} else if (!hasFirebaseAdminConfig) {
-    console.warn(
-        'Firebase Admin credentials (including storage bucket) are not set in .env.local. Skipping initialization. Some API routes may not work.'
-    );
 }
 
 export default admin;

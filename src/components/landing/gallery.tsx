@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface GalleryImage {
@@ -87,10 +87,12 @@ export default function Gallery() {
       </div>
       <Dialog open={!!selectedImage} onOpenChange={(isOpen) => !isOpen && setSelectedImage(null)}>
         <DialogContent className="max-w-4xl p-1 border-0 bg-background rounded-xl">
-          <DialogTitle className="sr-only">Enlarged gallery image</DialogTitle>
-          <DialogDescription className="sr-only">
-            {selectedImageData ? selectedImageData.alt : 'An enlarged view of a gallery image.'}
-          </DialogDescription>
+          <DialogHeader>
+            <DialogTitle className="sr-only">Enlarged gallery image</DialogTitle>
+            <DialogDescription className="sr-only">
+              {selectedImageData ? selectedImageData.alt : 'An enlarged view of a gallery image.'}
+            </DialogDescription>
+          </DialogHeader>
           {selectedImage && (
             <Image
               src={selectedImage}

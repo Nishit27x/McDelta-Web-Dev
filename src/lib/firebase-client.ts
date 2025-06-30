@@ -34,8 +34,6 @@ if (firebaseConfig.apiKey && firebaseConfig.authDomain && firebaseConfig.project
   } catch (error) {
      console.error('Firebase client initialization error', error);
   }
-} else {
-    console.warn("Firebase client credentials are not set in .env.local. Skipping initialization. Auth features will be disabled.");
 }
 
 export { app, auth };
