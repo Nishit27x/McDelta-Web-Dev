@@ -13,16 +13,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Construction, ArrowLeft, ShieldAlert, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Hashes a string using the SHA-256 algorithm.
-async function sha256(str: string): Promise<string> {
-    const buffer = new TextEncoder().encode(str);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
-}
-
-
 // Helper component for the pattern lock UI
 const PatternLock = ({ onComplete, resetKey }: { onComplete: (pattern: number[]) => void, resetKey: number }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -43,7 +33,7 @@ const PatternLock = ({ onComplete, resetKey }: { onComplete: (pattern: number[])
         draw(ctx);
       }
     }
-  }, [resetKey]);
+  }, [resetKey, dots]);
 
   const draw = (ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -183,21 +173,16 @@ export default function AdminPage() {
   const [view, setView] = useState<'login' | 'success' | 'error'>('login');
   const { toast } = useToast();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const correctUsername = 'ADMINDELTA';
-    // Password is 'adminpass'
-    const correctPasswordHash = 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3';
-    // Pattern is ']' -> [2, 5, 8]
-    const correctPatternHash = '86b63080c57c50614539564858d405333e69671194396b77207c4b694b2a818c';
-
-    const passwordHash = await sha256(password);
-    const patternHash = await sha256(JSON.stringify(pattern));
+    const correctPassword = 'adminpass';
+    const correctPattern = JSON.stringify([2, 5, 8]); // Pattern is ']' -> indices 2, 5, 8
 
     if (
         username.toUpperCase() === correctUsername &&
-        passwordHash === correctPasswordHash &&
-        patternHash === correctPatternHash
+        password === correctPassword &&
+        JSON.stringify(pattern) === correctPattern
     ) {
       setView('success');
       toast({ title: 'Access Granted', description: 'Welcome, Admin!' });
