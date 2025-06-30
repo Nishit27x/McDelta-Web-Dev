@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -54,6 +53,17 @@ export default function PlayerStatus() {
     return () => clearInterval(interval);
   }, []);
 
+  const getAvatarUrl = (player: Player) => {
+    // Crafatar uses UUIDs to fetch skins. For some players (like Bedrock players on a Java server),
+    // the server might not provide a valid UUID. In that case, we can fall back to using the
+    // player's name. We also strip the leading '.' that is often added to Bedrock player names.
+    const uuidRegex = /^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$/;
+    if (player.id && uuidRegex.test(player.id) && player.id !== '00000000-0000-0000-0000-000000000000') {
+        return `https://crafatar.com/avatars/${player.id}?overlay`;
+    }
+    const cleanName = player.name.startsWith('.') ? player.name.substring(1) : player.name;
+    return `https://crafatar.com/avatars/${cleanName}?overlay`;
+  };
 
   const filteredPlayers = useMemo(() => {
     if (!searchTerm) {
@@ -90,12 +100,13 @@ export default function PlayerStatus() {
             {filteredPlayers.length > 0 ? (
                 <ul className="space-y-3">
                 {filteredPlayers.map((player) => {
+                    const cleanName = player.name.startsWith('.') ? player.name.substring(1) : player.name;
                     return (
                     <li key={player.id} className="flex items-center justify-between p-3 rounded-md bg-background/50">
                         <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10 border-2 border-primary/50">
-                                <AvatarImage src={`https://crafatar.com/avatars/${player.id}?overlay`} alt={`${player.name}'s skin`} />
-                                <AvatarFallback>{player.name.charAt(0).toUpperCase()}</AvatarFallback>
+                                <AvatarImage src={getAvatarUrl(player)} alt={`${player.name}'s skin`} />
+                                <AvatarFallback>{cleanName.charAt(0).toUpperCase()}</AvatarFallback>
                             </Avatar>
                             <span className="font-medium">{player.name}</span>
                         </div>
