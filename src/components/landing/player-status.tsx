@@ -31,12 +31,14 @@ export default function PlayerStatus() {
       try {
         const res = await fetch('/api/mc-status');
         const data: ServerStatus = await res.json();
-        if (data && data.players) {
-          setOnlinePlayers(data.players.sort((a, b) => a.name.localeCompare(b.name)));
+        if (data && Array.isArray(data.players)) {
+          // Filter out players who might not have a name or id to prevent crashes
+          const validPlayers = data.players.filter(p => p && p.name && p.id);
+          setOnlinePlayers(validPlayers.sort((a, b) => a.name.localeCompare(b.name)));
           setTotalOnline(data.online);
         } else {
           setOnlinePlayers([]);
-          setTotalOnline(0);
+          setTotalOnline(data?.online || 0);
         }
       } catch (error) {
         console.error("Failed to fetch server status:", error);
