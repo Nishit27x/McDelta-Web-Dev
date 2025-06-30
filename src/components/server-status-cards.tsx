@@ -18,10 +18,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Users, Signal, ServerOff, Power } from "lucide-react";
 
+interface Player {
+  name: string;
+  id: string;
+}
+
 interface ServerStatus {
   online: number;
   max: number;
-  players: string[];
+  players: Player[];
   error?: string;
 }
 
@@ -77,7 +82,7 @@ export default function ServerStatusCards() {
               <div>
                 <p className="font-bold mb-2">Players:</p>
                 <ul className="list-disc list-inside">
-                  {status.players.map(p => <li key={p}>{p}</li>)}
+                  {status.players.map(p => <li key={p.id}>{p.name}</li>)}
                 </ul>
               </div>
             ) : (

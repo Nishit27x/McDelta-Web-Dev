@@ -5,17 +5,23 @@ import { useState, useEffect, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
+interface Player {
+  name: string;
+  id: string;
+}
 
 interface ServerStatus {
   online: number;
   max: number;
-  players: string[];
+  players: Player[];
   error?: string;
 }
 
 export default function PlayerStatus() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [onlinePlayers, setOnlinePlayers] = useState<string[]>([]);
+  const [onlinePlayers, setOnlinePlayers] = useState<Player[]>([]);
   const [totalOnline, setTotalOnline] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -26,7 +32,7 @@ export default function PlayerStatus() {
         const res = await fetch('/api/mc-status');
         const data: ServerStatus = await res.json();
         if (data && data.players) {
-          setOnlinePlayers(data.players.sort((a, b) => a.localeCompare(b)));
+          setOnlinePlayers(data.players.sort((a, b) => a.name.localeCompare(b.name)));
           setTotalOnline(data.online);
         } else {
           setOnlinePlayers([]);
@@ -52,7 +58,7 @@ export default function PlayerStatus() {
       return onlinePlayers;
     }
     return onlinePlayers.filter((player) =>
-      player.toLowerCase().includes(searchTerm.toLowerCase())
+      player.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [onlinePlayers, searchTerm]);
 
@@ -83,8 +89,14 @@ export default function PlayerStatus() {
                 <ul className="space-y-3">
                 {filteredPlayers.map((player) => {
                     return (
-                    <li key={player} className="flex items-center justify-between p-3 rounded-md bg-background/50">
-                        <span className="font-medium">{player}</span>
+                    <li key={player.id} className="flex items-center justify-between p-3 rounded-md bg-background/50">
+                        <div className="flex items-center gap-3">
+                            <Avatar className="h-10 w-10 border-2 border-primary/50">
+                                <AvatarImage src={`https://crafatar.com/avatars/${player.id}?overlay`} alt={`${player.name}'s skin`} />
+                                <AvatarFallback>{player.name.charAt(0).toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                            <span className="font-medium">{player.name}</span>
+                        </div>
                         <div className="flex items-center gap-2">
                         <span
                             className={`h-3 w-3 rounded-full bg-online`}
