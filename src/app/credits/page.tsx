@@ -1,4 +1,3 @@
-
 import Header from '@/components/header';
 import Footer from '@/components/landing/footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -10,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const credits = [
     {
         name: "LegendHacker27",
-        avatar: "https://crafatar.com/avatars/f84c6a79-0a4e-45e0-879b-cd49ebd4c4e2?overlay"
+        avatar: "https://crafatar.com/avatars/Herobrine?overlay"
     },
     {
         name: "Tobbler_",
