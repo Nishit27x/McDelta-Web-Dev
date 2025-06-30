@@ -40,7 +40,7 @@ export default function Header() {
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-2">
           <Button asChild>
-            <a href="https://discord.gg/kSE8qCUY" target="_blank" rel="noopener noreferrer">Join Now</a>
+            <a href="https://discord.gg/bwXrXzH3Wt" target="_blank" rel="noopener noreferrer">Join Now</a>
           </Button>
           <Sheet>
             <SheetTrigger asChild>
@@ -65,7 +65,7 @@ export default function Header() {
                 <Link href="/status" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Server Status</Link>
                 <Link href="/feedback" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Feedback</Link>
                 <Link href="/admin" className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>Admin</Link>
-                <a href="https://discord.gg/kSE8qCUY" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">Join</a>
+                <a href="https://discord.gg/bwXrXzH3Wt" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">Join</a>
               </nav>
             </SheetContent>
           </Sheet>

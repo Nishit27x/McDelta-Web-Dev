@@ -54,7 +54,7 @@ export default function Join() {
             </CardContent>
           </Card>
           <Button asChild size="lg" className="bg-[#5865F2] hover:bg-[#5865F2]/90 text-white" suppressHydrationWarning>
-            <a href="https://discord.gg/kSE8qCUY" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+            <a href="https://discord.gg/bwXrXzH3Wt" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
               <DiscordIcon className="w-6 h-6" />
               Join our Discord
             </a>

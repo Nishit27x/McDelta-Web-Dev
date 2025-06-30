@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -84,7 +85,7 @@ export default function Feedback() {
           </div>
         </div>
          <div className="text-center mt-12">
-            <p className="text-lg text-muted-foreground">Want to leave feedback? Join our <a href="https://discord.gg/kSE8qCUY" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Discord</a> and let us know!</p>
+            <p className="text-lg text-muted-foreground">Want to leave feedback? Join our <a href="https://discord.gg/bwXrXzH3Wt" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Discord</a> and let us know!</p>
         </div>
       </div>
     </section>

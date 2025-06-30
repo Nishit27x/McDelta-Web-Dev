@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -46,10 +47,10 @@ export default function Footer() {
             <Link href="/rules" className="text-muted-foreground hover:text-accent transition-colors">Rules</Link>
             <Link href="/status" className="text-muted-foreground hover:text-accent transition-colors">Server Status</Link>
             <Link href="/feedback" className="text-muted-foreground hover:text-accent transition-colors">Feedback</Link>
-            <a href="https://discord.gg/kSE8qCUY" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent transition-colors">Join</a>
+            <a href="https://discord.gg/bwXrXzH3Wt" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent transition-colors">Join</a>
           </nav>
           <div className="flex items-center space-x-4 justify-center md:justify-end">
-            <a href="https://discord.gg/kSE8qCUY" aria-label="Discord" className="text-muted-foreground hover:text-accent transition-colors"><DiscordIcon className="w-6 h-6" /></a>
+            <a href="https://discord.gg/bwXrXzH3Wt" aria-label="Discord" className="text-muted-foreground hover:text-accent transition-colors"><DiscordIcon className="w-6 h-6" /></a>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <button aria-label="YouTube" className="text-muted-foreground hover:text-accent transition-colors" suppressHydrationWarning>

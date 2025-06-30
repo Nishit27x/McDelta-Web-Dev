@@ -1,3 +1,4 @@
+
 import Header from '@/components/header';
 import Footer from '@/components/landing/footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -23,7 +24,7 @@ export default function FeedbackPage() {
           <CardContent className="flex flex-col items-center gap-4">
             <p className="text-sm text-muted-foreground">
               In the meantime, feel free to share your thoughts on our{' '}
-              <a href="https://discord.gg/kSE8qCUY" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+              <a href="https://discord.gg/bwXrXzH3Wt" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                 Discord server
               </a>
               .

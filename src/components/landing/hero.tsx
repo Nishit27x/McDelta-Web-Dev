@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -61,7 +62,7 @@ export default function Hero() {
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <Button size="lg" asChild>
-            <a href="https://discord.gg/kSE8qCUY" target="_blank" rel="noopener noreferrer">
+            <a href="https://discord.gg/bwXrXzH3Wt" target="_blank" rel="noopener noreferrer">
               Join Now
             </a>
           </Button>
