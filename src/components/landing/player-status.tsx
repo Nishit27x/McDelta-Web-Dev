@@ -55,22 +55,25 @@ export default function PlayerStatus() {
   }, []);
 
   const getAvatarUrl = (player: Player) => {
+    // We add a default skin to ensure an image is always returned, preventing fallbacks.
+    const defaultSkin = 'steve'; 
+    
     // For Bedrock players (whose names are usually prefixed with '.'), it's more reliable
     // to use their name for the avatar lookup.
     if (player.name.startsWith('.')) {
       const cleanName = player.name.substring(1);
-      // Crafatar can look up some Bedrock names, so we try this first.
-      return `https://crafatar.com/avatars/${cleanName}?overlay`;
+      return `https://crafatar.com/avatars/${cleanName}?overlay&default=${defaultSkin}`;
     }
 
     // For Java players, the UUID is the most reliable method.
     const uuidRegex = /^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$/;
     if (player.id && uuidRegex.test(player.id) && player.id !== '00000000-0000-0000-0000-000000000000') {
-      return `https://crafatar.com/avatars/${player.id}?overlay`;
+      return `https://crafatar.com/avatars/${player.id}?overlay&default=${defaultSkin}`;
     }
 
     // As a final fallback for any player, use their raw name.
-    return `https://crafatar.com/avatars/${player.name}?overlay`;
+    // This handles cases where a Java player's UUID isn't available but their name is.
+    return `https://crafatar.com/avatars/${player.name}?overlay&default=${defaultSkin}`;
   };
 
   const filteredPlayers = useMemo(() => {
