@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -54,15 +55,22 @@ export default function PlayerStatus() {
   }, []);
 
   const getAvatarUrl = (player: Player) => {
-    // Crafatar uses UUIDs to fetch skins. For some players (like Bedrock players on a Java server),
-    // the server might not provide a valid UUID. In that case, we can fall back to using the
-    // player's name. We also strip the leading '.' that is often added to Bedrock player names.
+    // For Bedrock players (whose names are usually prefixed with '.'), it's more reliable
+    // to use their name for the avatar lookup.
+    if (player.name.startsWith('.')) {
+      const cleanName = player.name.substring(1);
+      // Crafatar can look up some Bedrock names, so we try this first.
+      return `https://crafatar.com/avatars/${cleanName}?overlay`;
+    }
+
+    // For Java players, the UUID is the most reliable method.
     const uuidRegex = /^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$/;
     if (player.id && uuidRegex.test(player.id) && player.id !== '00000000-0000-0000-0000-000000000000') {
-        return `https://crafatar.com/avatars/${player.id}?overlay`;
+      return `https://crafatar.com/avatars/${player.id}?overlay`;
     }
-    const cleanName = player.name.startsWith('.') ? player.name.substring(1) : player.name;
-    return `https://crafatar.com/avatars/${cleanName}?overlay`;
+
+    // As a final fallback for any player, use their raw name.
+    return `https://crafatar.com/avatars/${player.name}?overlay`;
   };
 
   const filteredPlayers = useMemo(() => {
@@ -100,15 +108,16 @@ export default function PlayerStatus() {
             {filteredPlayers.length > 0 ? (
                 <ul className="space-y-3">
                 {filteredPlayers.map((player) => {
+                    // Clean name for display and for fallback avatar text
                     const cleanName = player.name.startsWith('.') ? player.name.substring(1) : player.name;
                     return (
                     <li key={player.id} className="flex items-center justify-between p-3 rounded-md bg-background/50">
                         <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10 border-2 border-primary/50">
-                                <AvatarImage src={getAvatarUrl(player)} alt={`${player.name}'s skin`} />
+                                <AvatarImage src={getAvatarUrl(player)} alt={`${cleanName}'s skin`} />
                                 <AvatarFallback>{cleanName.charAt(0).toUpperCase()}</AvatarFallback>
                             </Avatar>
-                            <span className="font-medium">{player.name}</span>
+                            <span className="font-medium">{cleanName}</span>
                         </div>
                         <div className="flex items-center gap-2">
                         <span
