@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -55,8 +54,10 @@ export default function PlayerStatus() {
   }, []);
 
   const getAvatarUrl = (player: Player) => {
-    // We add a default skin to ensure an image is always returned, preventing fallbacks.
-    const defaultSkin = 'steve'; 
+    // Determine the default skin (Steve or Alex) based on the player's name for consistency.
+    // This simple hash prevents random assignment on each render.
+    const nameHash = player.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const defaultSkin = nameHash % 2 === 0 ? 'steve' : 'alex';
     
     // For Bedrock players (whose names are usually prefixed with '.'), it's more reliable
     // to use their name for the avatar lookup.
