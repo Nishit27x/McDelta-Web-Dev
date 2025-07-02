@@ -9,11 +9,6 @@ import { UserSessionProvider } from '@/contexts/user-session-context';
 export const metadata: Metadata = {
   title: 'McDelta SMP',
   description: 'Welcome to the McDelta Lifesteal SMP Server!',
-  icons: {
-    icon: [],
-    shortcut: [],
-    apple: [],
-  },
 };
 
 export default function RootLayout({
