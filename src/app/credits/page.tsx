@@ -1,7 +1,7 @@
 import Header from '@/components/header';
 import Footer from '@/components/landing/footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Users, ArrowLeft } from 'lucide-react';
+import { Users, ArrowLeft, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -44,11 +44,12 @@ export default function CreditsPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 w-full pt-6">
                 {credits.map((person) => (
                     <div key={person.name} className="flex flex-col items-center gap-2">
+                        <Crown className="w-10 h-10 text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]" />
                         <Avatar className="w-24 h-24 border-2 border-primary">
                           <AvatarImage src={person.avatar} alt={`${person.name}'s avatar`} />
                           <AvatarFallback>{person.name.charAt(0)}</AvatarFallback>
                         </Avatar>
-                        <h4 className="font-headline font-bold text-2xl mt-4 bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-cyan-400 drop-shadow-sm">{person.name}</h4>
+                        <h4 className="font-headline font-bold text-2xl mt-2 bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-cyan-400 drop-shadow-sm">{person.name}</h4>
                     </div>
                 ))}
             </div>
