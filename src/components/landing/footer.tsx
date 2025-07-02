@@ -36,9 +36,12 @@ export default function Footer() {
     <footer className="bg-card text-card-foreground border-t">
       <div className="container mx-auto px-4 py-8">
         <div className="grid md:grid-cols-3 gap-8 items-center">
-          <div className="flex items-center space-x-2 justify-center md:justify-start">
-            <DiamondIcon className="h-6 w-6 text-accent" />
-            <span className="font-bold font-jokerman">McDelta SMP</span>
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex items-center space-x-2">
+              <DiamondIcon className="h-6 w-6 text-accent" />
+              <span className="font-bold font-jokerman">McDelta SMP</span>
+            </div>
+            <Link href="/credits" className="font-semibold text-primary text-sm transition-all drop-shadow-[0_0_4px_hsl(var(--primary)/0.6)] hover:drop-shadow-[0_0_10px_hsl(var(--primary)/0.9)]">Credits</Link>
           </div>
           <nav className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm font-medium">
             <Link href="/" className="text-muted-foreground hover:text-accent transition-colors">Home</Link>
@@ -47,7 +50,6 @@ export default function Footer() {
             <Link href="/rules" className="text-muted-foreground hover:text-accent transition-colors">Rules</Link>
             <Link href="/status" className="text-muted-foreground hover:text-accent transition-colors">Server Status</Link>
             <Link href="/feedback" className="text-muted-foreground hover:text-accent transition-colors">Feedback</Link>
-            <Link href="/credits" className="text-muted-foreground hover:text-accent transition-colors">Credits</Link>
             <a href="https://discord.gg/bwXrXzH3Wt" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent transition-colors">Join</a>
           </nav>
           <div className="flex items-center space-x-4 justify-center md:justify-end">

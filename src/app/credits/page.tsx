@@ -1,27 +1,35 @@
 import Header from '@/components/header';
 import Footer from '@/components/landing/footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Users, ArrowLeft } from 'lucide-react';
+import { Users, ArrowLeft, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from '@/lib/utils';
 
 const credits = [
     {
         name: "LegendHacker27",
-        avatar: "https://crafatar.com/avatars/f8cdb682-1457-4252-a430-5b8a61388914?overlay"
+        role: "lead",
+        crownClass: "text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.7)]",
+        nameClass: "text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.7)]",
     },
     {
         name: "Tobbler_",
-        avatar: "https://crafatar.com/avatars/f8cdb682-1457-4252-a430-5b8a61388914?overlay"
+        role: "admin",
+        crownClass: "text-lime-400 drop-shadow-[0_0_10px_rgba(163,230,53,0.7)]",
+        nameClass: "text-lime-400 drop-shadow-[0_0_5px_rgba(163,230,53,0.7)]",
     },
     {
         name: "VaibhavOp345",
-        avatar: "https://crafatar.com/avatars/f8cdb682-1457-4252-a430-5b8a61388914?overlay"
+        role: "admin",
+        crownClass: "text-purple-400 drop-shadow-[0_0_10px_rgba(192,132,252,0.7)]",
+        nameClass: "text-purple-400 drop-shadow-[0_0_5px_rgba(192,132,252,0.7)]",
     },
     {
         name: "Mrkiller0033",
-        avatar: "https://crafatar.com/avatars/f8cdb682-1457-4252-a430-5b8a61388914?overlay"
+        role: "admin",
+        crownClass: "text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.7)]",
+        nameClass: "text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.7)]",
     }
 ];
 
@@ -43,12 +51,11 @@ export default function CreditsPage() {
           <CardContent className="flex flex-col items-center gap-6">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 w-full pt-6">
                 {credits.map((person) => (
-                    <div key={person.name} className="flex flex-col items-center gap-2">
-                        <Avatar className="w-24 h-24 border-2 border-primary">
-                          <AvatarImage src={person.avatar} alt={`${person.name}'s avatar`} />
-                          <AvatarFallback>{person.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <h4 className="font-headline font-bold text-2xl mt-4 bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-cyan-400 drop-shadow-sm">{person.name}</h4>
+                    <div key={person.name} className="flex flex-col items-center gap-4">
+                        <div className="h-24 w-24 flex items-center justify-center">
+                            <Crown className={cn("w-20 h-20", person.crownClass)} />
+                        </div>
+                        <h4 className={cn("font-headline font-bold text-2xl mt-2", person.nameClass)}>{person.name}</h4>
                     </div>
                 ))}
             </div>
