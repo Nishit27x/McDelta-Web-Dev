@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -35,7 +36,7 @@ export default function Footer() {
     <footer className="bg-card text-card-foreground border-t">
       <div className="container mx-auto px-4 py-8">
         <div className="grid md:grid-cols-3 gap-8 items-center">
-          <div className="flex flex-col items-center md:items-start gap-2">
+          <div className="flex flex-col items-center gap-2">
             <div className="flex items-center space-x-2">
               <DiamondIcon className="h-6 w-6 text-accent" />
               <span className="font-bold font-jokerman">McDelta SMP</span>
