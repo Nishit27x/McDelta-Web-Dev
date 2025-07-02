@@ -1,3 +1,4 @@
+
 import Header from '@/components/header';
 import Footer from '@/components/landing/footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -9,19 +10,19 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const credits = [
     {
         name: "LegendHacker27",
-        avatar: "https://crafatar.com/avatars/690a424c-2a66-4f51-872f-5f89a2e6e87b?overlay"
+        avatar: "https://crafatar.com/avatars/a54f65a5-4c63-42b8-8067-178b273b5034?overlay"
     },
     {
         name: "Tobbler_",
-        avatar: "https://crafatar.com/avatars/f84c6a79-0a4e-45e0-879b-cd49ebd4c4e2?overlay"
+        avatar: "https://crafatar.com/avatars/066f108d-8c46-4449-9f5b-918293524b8c?overlay"
     },
     {
         name: "VaibhavOp345",
-        avatar: "https://crafatar.com/avatars/690a424c-2a66-4f51-872f-5f89a2e6e87b?overlay"
+        avatar: "https://crafatar.com/avatars/c9735165-f48a-4f15-b972-e19c30058b76?overlay"
     },
     {
         name: "Mrkiller0033",
-        avatar: "https://crafatar.com/avatars/690a424c-2a66-4f51-872f-5f89a2e6e87b?overlay"
+        avatar: "https://crafatar.com/avatars/b7f753c1-1579-4a4f-8319-3837968a3bee?overlay"
     }
 ];
 
