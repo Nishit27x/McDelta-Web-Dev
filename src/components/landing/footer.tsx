@@ -35,9 +35,12 @@ export default function Footer() {
     <footer className="bg-card text-card-foreground border-t">
       <div className="container mx-auto px-4 py-8">
         <div className="grid md:grid-cols-3 gap-8 items-center">
-          <div className="flex items-center space-x-2 justify-center md:justify-start">
-            <DiamondIcon className="h-6 w-6 text-accent" />
-            <span className="font-bold font-jokerman">McDelta SMP</span>
+          <div className="flex flex-col items-center md:items-start gap-2">
+            <div className="flex items-center space-x-2">
+              <DiamondIcon className="h-6 w-6 text-accent" />
+              <span className="font-bold font-jokerman">McDelta SMP</span>
+            </div>
+            <Link href="/credits" className="font-semibold text-primary hover:underline text-sm md:pl-8">Credits</Link>
           </div>
           <nav className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm font-medium">
             <Link href="/" className="text-muted-foreground hover:text-accent transition-colors">Home</Link>
@@ -71,7 +74,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-border/50 text-center text-muted-foreground text-sm">
-          <p>&copy; {new Date().getFullYear()} McDelta SMP. All Rights Reserved. &bull; <Link href="/credits" className="font-semibold text-primary hover:underline">Credits</Link></p>
+          <p>&copy; {new Date().getFullYear()} McDelta SMP. All Rights Reserved.</p>
           <p className="mt-1">Not an official Minecraft product. Not approved by or associated with Mojang.</p>
         </div>
       </div>
