@@ -26,7 +26,7 @@ const credits = [
     {
         name: "Mrkiller0033",
         role: "admin",
-        crownClass: "text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.7)]",
+        crownClass: "text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.7)]",
     }
 ];
 
