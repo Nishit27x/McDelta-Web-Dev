@@ -5,7 +5,7 @@ export const revalidate = 60; // Revalidate every 60 seconds
 
 const serverConfig = {
   host: 'paid-1.guardxhosting.in',
-  port: 25501, // Game port for status ping
+  port: 25783, // Game port for status ping
 };
 
 export async function GET() {
