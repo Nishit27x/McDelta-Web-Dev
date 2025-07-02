@@ -16,7 +16,7 @@ const credits = [
     {
         name: "Tobbler_",
         role: "admin",
-        crownClass: "text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.7)]",
+        crownClass: "text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.7)]",
     },
     {
         name: "VaibhavOp345",
