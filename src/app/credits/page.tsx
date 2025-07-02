@@ -5,24 +5,24 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Users, ArrowLeft, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from '@/lib/utils';
 
 const credits = [
     {
         name: "LegendHacker27",
-        avatar: "https://crafatar.com/avatars/a54f65a5-4c63-42b8-8067-178b273b5034?overlay"
+        role: "lead",
     },
     {
         name: "Tobbler_",
-        avatar: "https://crafatar.com/avatars/066f108d-8c46-4449-9f5b-918293524b8c?overlay"
+        role: "admin",
     },
     {
         name: "VaibhavOp345",
-        avatar: "https://crafatar.com/avatars/c9735165-f48a-4f15-b972-e19c30058b76?overlay"
+        role: "admin",
     },
     {
         name: "Mrkiller0033",
-        avatar: "https://crafatar.com/avatars/b7f753c1-1579-4a4f-8319-3837968a3bee?overlay"
+        role: "admin",
     }
 ];
 
@@ -44,12 +44,15 @@ export default function CreditsPage() {
           <CardContent className="flex flex-col items-center gap-6">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 w-full pt-6">
                 {credits.map((person) => (
-                    <div key={person.name} className="flex flex-col items-center gap-2">
-                        <Crown className="w-10 h-10 text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]" />
-                        <Avatar className="w-24 h-24 border-2 border-primary">
-                          <AvatarImage src={person.avatar} alt={`${person.name}'s avatar`} />
-                          <AvatarFallback>{person.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
+                    <div key={person.name} className="flex flex-col items-center gap-4">
+                        <div className="h-24 w-24 flex items-center justify-center">
+                            <Crown className={cn(
+                                "w-20 h-20",
+                                person.role === 'lead'
+                                    ? "text-purple-400 drop-shadow-[0_0_10px_rgba(192,132,252,0.7)]"
+                                    : "text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.7)]"
+                            )} />
+                        </div>
                         <h4 className="font-headline font-bold text-2xl mt-2 bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-cyan-400 drop-shadow-sm">{person.name}</h4>
                     </div>
                 ))}
