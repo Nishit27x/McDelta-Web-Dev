@@ -1,4 +1,3 @@
-
 import Header from '@/components/header';
 import Footer from '@/components/landing/footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -16,7 +15,7 @@ const credits = [
     {
         name: "Tobbler_",
         role: "admin",
-        crownClass: "text-pink-400 drop-shadow-[0_0_10px_rgba(244,114,182,0.7)]",
+        crownClass: "text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.7)]",
     },
     {
         name: "VaibhavOp345",
