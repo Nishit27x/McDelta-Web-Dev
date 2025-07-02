@@ -10,9 +10,9 @@ import * as React from 'react';
 
 export default function Hero() {
   const images = [
-    { src: 'https://placehold.co/1920x1080.png', alt: 'Minecraft gameplay screenshot 1', hint: 'minecraft landscape' },
-    { src: 'https://placehold.co/1920x1081.png', alt: 'Minecraft PvP battle', hint: 'minecraft pvp' },
-    { src: 'https://placehold.co/1920x1082.png', alt: 'Minecraft custom build', hint: 'minecraft castle' },
+    { src: '/img/jpg/09.png.jpg', alt: 'Minecraft custom build', hint: 'minecraft castle' },
+    { src: '/img/jpg/01.png.jpg', alt: 'Minecraft PvP battle', hint: 'minecraft pvp' },
+    { src: '/img/jpg/08.png.jpg', alt: 'Minecraft gameplay screenshot 1', hint: 'minecraft landscape' },
   ];
 
   const plugin = React.useRef(
