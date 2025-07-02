@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -47,7 +46,6 @@ export default function Footer() {
             <Link href="/rules" className="text-muted-foreground hover:text-accent transition-colors">Rules</Link>
             <Link href="/status" className="text-muted-foreground hover:text-accent transition-colors">Server Status</Link>
             <Link href="/feedback" className="text-muted-foreground hover:text-accent transition-colors">Feedback</Link>
-            <Link href="/credits" className="text-muted-foreground hover:text-accent transition-colors">Credits</Link>
             <a href="https://discord.gg/bwXrXzH3Wt" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent transition-colors">Join</a>
           </nav>
           <div className="flex items-center space-x-4 justify-center md:justify-end">
@@ -73,7 +71,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-border/50 text-center text-muted-foreground text-sm">
-          <p>&copy; {new Date().getFullYear()} McDelta SMP. All Rights Reserved.</p>
+          <p>&copy; {new Date().getFullYear()} McDelta SMP. All Rights Reserved. &bull; <Link href="/credits" className="font-semibold text-primary hover:underline">Credits</Link></p>
           <p className="mt-1">Not an official Minecraft product. Not approved by or associated with Mojang.</p>
         </div>
       </div>
