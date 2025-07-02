@@ -11,18 +11,22 @@ const credits = [
     {
         name: "LegendHacker27",
         role: "lead",
+        crownClass: "text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.7)]",
     },
     {
         name: "Tobbler_",
         role: "admin",
+        crownClass: "text-orange-400 drop-shadow-[0_0_10px_rgba(251,146,60,0.7)]",
     },
     {
         name: "VaibhavOp345",
         role: "admin",
+        crownClass: "text-purple-400 drop-shadow-[0_0_10px_rgba(192,132,252,0.7)]",
     },
     {
         name: "Mrkiller0033",
         role: "admin",
+        crownClass: "text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.7)]",
     }
 ];
 
@@ -46,12 +50,7 @@ export default function CreditsPage() {
                 {credits.map((person) => (
                     <div key={person.name} className="flex flex-col items-center gap-4">
                         <div className="h-24 w-24 flex items-center justify-center">
-                            <Crown className={cn(
-                                "w-20 h-20",
-                                person.role === 'lead'
-                                    ? "text-purple-400 drop-shadow-[0_0_10px_rgba(192,132,252,0.7)]"
-                                    : "text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.7)]"
-                            )} />
+                            <Crown className={cn("w-20 h-20", person.crownClass)} />
                         </div>
                         <h4 className="font-headline font-bold text-2xl mt-2 bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-cyan-400 drop-shadow-sm">{person.name}</h4>
                     </div>
