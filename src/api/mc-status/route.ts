@@ -1,6 +1,8 @@
+
 import { status } from 'minecraft-server-util';
 import { NextResponse } from 'next/server';
 
+export const runtime = 'nodejs';
 export const revalidate = 0; // Set to 0 to disable caching and ensure real-time status
 
 const serverConfig = {
@@ -17,6 +19,7 @@ export async function GET() {
 
     const playersList = response.players.sample ? response.players.sample.map(p => ({ name: p.name, id: p.id })) : [];
     
+    // This logic ensures the 'online' count is never less than the number of players listed.
     const onlineCount = Math.max(response.players.online, playersList.length);
 
     const data = {
