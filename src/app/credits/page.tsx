@@ -11,21 +11,25 @@ const credits = [
         name: "LegendHacker27",
         role: "lead",
         crownClass: "text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.7)]",
+        nameClass: "text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.7)]",
     },
     {
         name: "Tobbler_",
         role: "admin",
         crownClass: "text-lime-400 drop-shadow-[0_0_10px_rgba(163,230,53,0.7)]",
+        nameClass: "text-lime-400 drop-shadow-[0_0_5px_rgba(163,230,53,0.7)]",
     },
     {
         name: "VaibhavOp345",
         role: "admin",
         crownClass: "text-purple-400 drop-shadow-[0_0_10px_rgba(192,132,252,0.7)]",
+        nameClass: "text-purple-400 drop-shadow-[0_0_5px_rgba(192,132,252,0.7)]",
     },
     {
         name: "Mrkiller0033",
         role: "admin",
         crownClass: "text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.7)]",
+        nameClass: "text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.7)]",
     }
 ];
 
@@ -51,7 +55,7 @@ export default function CreditsPage() {
                         <div className="h-24 w-24 flex items-center justify-center">
                             <Crown className={cn("w-20 h-20", person.crownClass)} />
                         </div>
-                        <h4 className="font-headline font-bold text-2xl mt-2 bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-cyan-400 drop-shadow-sm">{person.name}</h4>
+                        <h4 className={cn("font-headline font-bold text-2xl mt-2", person.nameClass)}>{person.name}</h4>
                     </div>
                 ))}
             </div>
