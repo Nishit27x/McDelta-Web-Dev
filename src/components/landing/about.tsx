@@ -15,7 +15,8 @@ export default function About() {
           </div>
           <div className="relative aspect-square rounded-xl overflow-hidden group shadow-2xl shadow-primary/20 transition-all duration-300 ease-in-out hover:shadow-primary/40 hover:shadow-2xl hover:scale-105">
             <img
-              src="https://placehold.co/800x800.png"
+              //src="https://placehold.co/800x800.png"
+              src="/logo.jpg"
               alt="McDelta SMP promotional image featuring a character in a Minecraft world"
               data-ai-hint="minecraft character"
               className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
