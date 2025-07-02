@@ -15,10 +15,14 @@ export async function GET() {
       enableSRV: false,
     });
 
+    const playersList = response.players.sample ? response.players.sample.map(p => ({ name: p.name, id: p.id })) : [];
+    
+    const onlineCount = Math.max(response.players.online, playersList.length);
+
     const data = {
-      online: response.players.online,
+      online: onlineCount,
       max: response.players.max,
-      players: response.players.sample ? response.players.sample.map(p => ({ name: p.name, id: p.id })) : [],
+      players: playersList,
     };
 
     return NextResponse.json(data);
