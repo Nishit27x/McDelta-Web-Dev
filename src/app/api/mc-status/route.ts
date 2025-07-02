@@ -1,7 +1,7 @@
 import { status } from 'minecraft-server-util';
 import { NextResponse } from 'next/server';
 
-export const revalidate = 60; // Revalidate every 60 seconds
+export const revalidate = 0; // Set to 0 to disable caching and ensure real-time status
 
 const serverConfig = {
   host: 'paid-1.guardxhosting.in',
@@ -26,7 +26,7 @@ export async function GET() {
     console.error('Failed to query Minecraft server:', error);
     return NextResponse.json(
       { online: 0, max: 0, players: [], error: 'Server is offline or unreachable.' },
-      { status: 500 }
+      { status: 200 } // Return 200 OK with an error payload for the client to handle
     );
   }
 }
