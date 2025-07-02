@@ -40,7 +40,7 @@ export default function Footer() {
               <DiamondIcon className="h-6 w-6 text-accent" />
               <span className="font-bold font-jokerman">McDelta SMP</span>
             </div>
-            <Link href="/credits" className="font-semibold text-primary hover:underline text-sm md:pl-8">Credits</Link>
+            <Link href="/credits" className="font-semibold text-primary text-sm transition-all drop-shadow-[0_0_4px_hsl(var(--primary)/0.6)] hover:drop-shadow-[0_0_10px_hsl(var(--primary)/0.9)]">Credits</Link>
           </div>
           <nav className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm font-medium">
             <Link href="/" className="text-muted-foreground hover:text-accent transition-colors">Home</Link>
