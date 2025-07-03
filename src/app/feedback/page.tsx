@@ -10,12 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { useUserSession, AuthWrapper } from '@/contexts/user-session-context';
 import { Star, MessageSquareQuote } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const feedbackSchema = z.object({
+  name: z.string().min(3, "Your name must be at least 3 characters.").max(20, "Your name is too long."),
   message: z.string().min(10, "Your message is too short.").max(500, "Your message is too long."),
   rating: z.number().min(1, "Please provide a rating.").max(5),
 });
@@ -43,25 +44,17 @@ const StarRating = ({ value, onChange }: { value: number, onChange: (value: numb
 const FeedbackForm = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { toast } = useToast();
-    const { profile } = useUserSession();
 
     const form = useForm<z.infer<typeof feedbackSchema>>({
         resolver: zodResolver(feedbackSchema),
         defaultValues: {
+            name: '',
             message: '',
             rating: 0,
         },
     });
 
     async function onSubmit(values: z.infer<typeof feedbackSchema>) {
-        if (!profile) {
-            toast({
-                variant: 'destructive',
-                title: 'Not Signed In',
-                description: 'You must be signed in to submit feedback.',
-            });
-            return;
-        }
         setIsSubmitting(true);
         try {
             const response = await fetch('/api/feedback', {
@@ -88,27 +81,6 @@ const FeedbackForm = () => {
             setIsSubmitting(false);
         }
     }
-
-    if (!profile) {
-        return (
-             <Card className="w-full max-w-lg text-center">
-                <CardHeader>
-                    <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit">
-                        <MessageSquareQuote className="h-12 w-12 text-primary" />
-                    </div>
-                    <CardTitle className="mt-4">Share Your Feedback</CardTitle>
-                    <CardDescription>
-                        You must be signed in to leave a review.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                        Please use the "ADMIN" button in the header to sign in.
-                    </p>
-                </CardContent>
-            </Card>
-        );
-    }
     
     return (
         <Card className="w-full max-w-lg">
@@ -132,6 +104,22 @@ const FeedbackForm = () => {
                                     <FormLabel className="mb-2">Your Rating</FormLabel>
                                     <FormControl>
                                         <StarRating value={field.value} onChange={field.onChange} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Your Name</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            placeholder="Enter your name or gamertag"
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -171,9 +159,7 @@ export default function FeedbackPage() {
     <div className="flex flex-col min-h-dvh bg-background">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-16 flex items-center justify-center">
-        <AuthWrapper>
-            <FeedbackForm />
-        </AuthWrapper>
+        <FeedbackForm />
       </main>
       <Footer />
     </div>
