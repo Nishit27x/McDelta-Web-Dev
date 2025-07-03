@@ -16,6 +16,8 @@ import { cn } from '@/lib/utils';
 const RconConsoleView = () => {
   const [output, setOutput] = useState<string[]>(['Welcome to the RCON console.']);
   const [command, setCommand] = useState('');
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const outputRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -34,6 +36,16 @@ const RconConsoleView = () => {
 
     setIsSubmitting(true);
     setOutput(prev => [...prev, `> ${trimmedCommand}`]);
+
+    // Add to command history if it's new, and reset index
+    if (!commandHistory.includes(trimmedCommand)) {
+        const newHistory = [...commandHistory, trimmedCommand];
+        setCommandHistory(newHistory);
+        setHistoryIndex(newHistory.length);
+    } else {
+        // If command exists, just reset the index to the end
+        setHistoryIndex(commandHistory.length);
+    }
 
     try {
       const response = await fetch('/api/rcon', {
@@ -65,6 +77,28 @@ const RconConsoleView = () => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (commandHistory.length === 0) return;
+
+    if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const newIndex = Math.max(0, historyIndex - 1);
+        setHistoryIndex(newIndex);
+        setCommand(commandHistory[newIndex] || '');
+    } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (historyIndex < commandHistory.length - 1) {
+            const newIndex = historyIndex + 1;
+            setHistoryIndex(newIndex);
+            setCommand(commandHistory[newIndex] || '');
+        } else {
+            // When pressing down at the end of history, clear the input
+            setHistoryIndex(commandHistory.length);
+            setCommand('');
+        }
+    }
+  };
+
   return (
     <Card className="w-full max-w-4xl h-[75vh] flex flex-col">
       <CardHeader>
@@ -93,6 +127,7 @@ const RconConsoleView = () => {
             type="text"
             value={command}
             onChange={(e) => setCommand(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Enter a command... (e.g., 'list')"
             disabled={isSubmitting}
             className="font-mono flex-grow"
