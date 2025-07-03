@@ -39,7 +39,8 @@ const ConsoleView = () => {
             const errorData = await res.json();
             errorMsg = errorData.error || errorMsg;
           } catch (e) {
-            console.error("Could not parse error response as JSON.");
+            // The response was not JSON, which can happen for various reasons.
+            // We'll stick with the original status text.
           }
           throw new Error(errorMsg);
         }
@@ -110,8 +111,23 @@ const ConsoleView = () => {
       } catch (error) {
         setConnectionStatus('error');
         const errorMessage = (error as Error).message;
-        setOutput(prev => [...prev, `Error: ${errorMessage}`]);
-        toast({ variant: 'destructive', title: 'Connection Failed', description: errorMessage });
+        let userFriendlyMessage = `Error: ${errorMessage}`;
+        let toastDescription = errorMessage;
+
+        if (errorMessage.includes('Server configuration error')) {
+            userFriendlyMessage = 'Error: Server configuration error. The Pterodactyl API keys seem to be missing or incorrect.';
+            toastDescription = 'Please ensure your Pterodactyl API keys are set correctly in a .env.local file and that you have restarted the development server. If deployed, check your hosting provider\'s environment variables.';
+        } else if (errorMessage.includes('Failed to get live console credentials')) {
+            toastDescription = 'This could be due to an incorrect Server ID or an issue with the Pterodactyl panel. Please verify your settings.';
+        }
+
+        setOutput(prev => [...prev, userFriendlyMessage]);
+        toast({ 
+            variant: 'destructive', 
+            title: 'Connection Failed', 
+            description: toastDescription,
+            duration: 10000 // Give more time to read
+        });
       }
     };
 
