@@ -32,10 +32,18 @@ const ConsoleView = () => {
     const connect = async () => {
       try {
         const res = await fetch('/api/live-console');
+
         if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error || 'Failed to get connection credentials.');
+          let errorMsg = `API Error: ${res.status} ${res.statusText}`;
+          try {
+            const errorData = await res.json();
+            errorMsg = errorData.error || errorMsg;
+          } catch (e) {
+            console.error("Could not parse error response as JSON.");
+          }
+          throw new Error(errorMsg);
         }
+        
         const { token, socketUrl } = await res.json();
 
         ws.current = new WebSocket(socketUrl);
