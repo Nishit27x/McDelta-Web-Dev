@@ -1,9 +1,11 @@
+
 import { type NextRequest, NextResponse } from 'next/server';
 import admin from '@/lib/firebase-admin';
 import * as z from 'zod';
-import { verifySession } from '@/lib/session-verifier';
+import { randomUUID } from 'crypto';
 
 const feedbackSchema = z.object({
+  name: z.string().min(3, "Name must be at least 3 characters.").max(20, "Name is too long."),
   message: z.string().min(10, "Message must be at least 10 characters.").max(500),
   rating: z.number().min(1).max(5),
 });
@@ -19,13 +21,18 @@ export async function GET() {
   try {
     const db = admin.database();
     const ref = db.ref('reviews');
-    const snapshot = await ref.orderByChild('createdAt').limitToLast(50).once('value');
+    
+    // Only fetch reviews from the last 30 days
+    const oneMonthAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+
+    const snapshot = await ref.orderByChild('createdAt').startAt(oneMonthAgo).once('value');
+
     if (snapshot.exists()) {
       const data = snapshot.val();
       const reviews = Object.keys(data).map(key => ({
         id: key,
         ...data[key],
-      })).sort((a, b) => b.createdAt - a.createdAt);
+      })).sort((a, b) => b.createdAt - a.createdAt); // Keep sorting by most recent
       return NextResponse.json(reviews, { status: 200 });
     }
     return NextResponse.json([], { status: 200 });
@@ -36,14 +43,10 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  let decodedToken;
-  try {
-    // This will throw an error if the session is not valid, protecting the endpoint.
-    decodedToken = await verifySession(request);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 401 });
+  if (!isFirebaseAdminInitialized()) {
+    return NextResponse.json({ error: 'Server not configured for feedback.' }, { status: 503 });
   }
-
+    
   let body;
   try {
     body = await request.json();
@@ -58,24 +61,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: firstError }, { status: 400 });
   }
   
-  const { message, rating } = validation.data;
-  const { uid, display_name: gamertag, picture: avatar } = decodedToken;
-
-  if (!gamertag) {
-     return NextResponse.json({ error: 'Gamertag not found in user session.' }, { status: 400 });
-  }
+  const { name, message, rating } = validation.data;
   
   try {
     const db = admin.database();
     const ref = db.ref('reviews');
     
+    const anonymousId = randomUUID();
     const newReview = {
-        name: gamertag,
+        name,
         message,
         rating,
-        avatar: avatar || `https://crafatar.com/avatars/${uid}?overlay`, // Use token picture or fallback
+        avatar: `https://crafatar.com/avatars/${anonymousId}?overlay`, // Generic but unique avatar
         createdAt: Date.now(),
-        uid: uid
+        uid: anonymousId, // use randomId as a unique identifier for the avatar
     };
 
     const newReviewRef = await ref.push(newReview);
