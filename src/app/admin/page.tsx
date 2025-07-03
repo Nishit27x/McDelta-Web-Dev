@@ -35,6 +35,15 @@ const RconConsoleView = () => {
     inputRef.current?.focus();
   }, []);
 
+  useEffect(() => {
+    // Re-focus the input after a command has been submitted.
+    // This runs after the component re-renders, ensuring the input is not disabled.
+    if (!isSubmitting) {
+      inputRef.current?.focus();
+    }
+  }, [isSubmitting]);
+
+
   const handleSendCommand = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedCommand = command.trim();
@@ -80,7 +89,6 @@ const RconConsoleView = () => {
     } finally {
       setCommand('');
       setIsSubmitting(false);
-      inputRef.current?.focus();
     }
   };
 
