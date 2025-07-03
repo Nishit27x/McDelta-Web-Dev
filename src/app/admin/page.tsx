@@ -85,7 +85,14 @@ const ConsoleView = () => {
         };
 
         ws.current.onclose = (event) => {
-          // Don't show disconnected message if it was an error
+          // If the connection closes while we were still in the 'connecting' state, it's an error.
+          if (connectionStatus === 'connecting') {
+            setConnectionStatus('error');
+            setOutput(prev => [...prev, 'Error: Connection failed unexpectedly. The server may be offline or restarting.']);
+            toast({ variant: 'destructive', title: 'Connection Failed', description: 'Could not connect to the live console.' });
+            return;
+          }
+          // If it closes and it wasn't a clean close (e.g. server crash), and we aren't already showing an error.
           if (!event.wasClean && connectionStatus !== 'error') {
             setConnectionStatus('disconnected');
             setOutput(prev => [...prev, 'Connection closed.']);
@@ -109,8 +116,8 @@ const ConsoleView = () => {
         ws.current.close();
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
 
   const handleSendCommand = (e: React.FormEvent) => {
