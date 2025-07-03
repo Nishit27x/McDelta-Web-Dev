@@ -9,11 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Terminal, ShieldAlert, LogIn } from 'lucide-react';
+import { ArrowLeft, Terminal } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useUserSession } from '@/contexts/user-session-context';
-import { Skeleton } from '@/components/ui/skeleton';
-import SignInModal from '@/components/sign-in-modal';
 
 // The main component for the console UI
 const ConsoleView = () => {
@@ -191,77 +188,13 @@ const ConsoleView = () => {
 };
 
 
-// A component to show while checking authentication
-const LoadingState = () => (
-    <Card className="w-full max-w-4xl h-[75vh] flex flex-col">
-        <CardHeader>
-             <Skeleton className="h-12 w-12 rounded-full" />
-             <div className="space-y-2 mt-4">
-                <Skeleton className="h-6 w-[250px]" />
-                <Skeleton className="h-4 w-[400px]" />
-             </div>
-        </CardHeader>
-        <CardContent>
-            <Skeleton className="h-full w-full" />
-        </CardContent>
-    </Card>
-);
-
-// A component to show for non-admins or logged out users
-const AccessDenied = ({ onSignIn }: { onSignIn: () => void }) => (
-    <Card className="w-full max-w-md text-center">
-        <CardHeader>
-             <div className="mx-auto bg-destructive/10 p-4 rounded-full w-fit">
-                <ShieldAlert className="h-12 w-12 text-destructive" />
-            </div>
-            <CardTitle className="mt-4">Access Denied</CardTitle>
-            <CardDescription>
-                You must be signed in as an administrator to access the server console.
-            </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-             <Button onClick={onSignIn}>
-                <LogIn className="mr-2 h-4 w-4" />
-                Sign In
-            </Button>
-            <Button asChild variant="link">
-              <Link href="/">
-                Go back to homepage
-              </Link>
-            </Button>
-        </CardContent>
-    </Card>
-);
-
-
 export default function AdminPage() {
-  const { profile, isLoading } = useUserSession();
-  const [showSignInModal, setShowSignInModal] = useState(false);
-
-  const renderContent = () => {
-    if (isLoading) {
-      return <LoadingState />;
-    }
-
-    if (!profile || !profile.isAdmin) {
-      return <AccessDenied onSignIn={() => setShowSignInModal(true)} />;
-    }
-
-    return <ConsoleView />;
-  }
-
   return (
     <div className="flex flex-col min-h-dvh bg-background">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-16 flex items-center justify-center">
-        {renderContent()}
+        <ConsoleView />
       </main>
-      {showSignInModal && (
-        <SignInModal 
-          onSuccess={() => setShowSignInModal(false)}
-          onCancel={() => setShowSignInModal(false)}
-        />
-      )}
       <Footer />
     </div>
   );

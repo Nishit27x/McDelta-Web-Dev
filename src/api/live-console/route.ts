@@ -1,34 +1,11 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { verifySession } from '@/lib/session-verifier';
-import admin from '@/lib/firebase-admin';
 
-async function isAdmin(uid: string): Promise<boolean> {
-  const db = admin.database();
-  const adminGamertags = (process.env.ADMIN_GAMERTAGS || '').split(',').map(g => g.trim().toLowerCase()).filter(Boolean);
-  
-  const userRef = db.ref(`users/${uid}`);
-  const snapshot = await userRef.once('value');
-  if (!snapshot.exists()) return false;
-  
-  const userProfile = snapshot.val();
-  return adminGamertags.includes(userProfile.gamertag.toLowerCase());
-}
+// NOTE: Authentication has been temporarily removed for testing purposes.
+// Anyone with the link can currently access this endpoint.
 
 export async function GET(request: NextRequest) {
-  // 1. Verify user is an authenticated admin
-  let decodedToken;
-  try {
-    decodedToken = await verifySession(request);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 401 });
-  }
-
-  if (!await isAdmin(decodedToken.uid)) {
-    return NextResponse.json({ error: 'Unauthorized: Admin access required.' }, { status: 403 });
-  }
-
-  // 2. Get Pterodactyl secrets
+  // 1. Get Pterodactyl secrets from environment variables
   const apiKey = process.env.PTERODACTYL_API_KEY;
   const serverId = process.env.PTERODACTYL_SERVER_ID;
   
@@ -37,7 +14,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Server configuration error.' }, { status: 500 });
   }
 
-  // 3. Fetch WebSocket credentials from Pterodactyl
+  // 2. Fetch WebSocket credentials from Pterodactyl
   const pteroApiUrl = `https://panel.zoominghost.com/api/client/servers/${serverId}/websocket`;
 
   try {
@@ -70,7 +47,7 @@ export async function GET(request: NextRequest) {
       throw new Error('Invalid response from Pterodactyl API.');
     }
 
-    // 4. Return credentials to the client
+    // 3. Return credentials to the client
     return NextResponse.json({ token, socketUrl });
 
   } catch (error) {
