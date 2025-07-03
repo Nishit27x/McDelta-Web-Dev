@@ -4,13 +4,38 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { Rcon } from 'rcon-client';
 import * as z from 'zod';
+import { verifySession } from '@/lib/session-verifier';
+import admin from '@/lib/firebase-admin';
 
 const rconCommandSchema = z.object({
   command: z.string().min(1, 'Command cannot be empty.'),
 });
 
+async function isAdmin(uid: string): Promise<boolean> {
+  if (!admin.apps.length) return false;
+  const db = admin.database();
+  const adminGamertags = (process.env.ADMIN_GAMERTAGS || '').split(',').map(g => g.trim().toLowerCase()).filter(Boolean);
+  
+  const userRef = db.ref(`users/${uid}`);
+  const snapshot = await userRef.once('value');
+  if (!snapshot.exists()) return false;
+  
+  const userProfile = snapshot.val();
+  if (!userProfile.gamertag) return false;
+
+  return adminGamertags.includes(userProfile.gamertag.toLowerCase());
+}
 
 export async function POST(request: NextRequest) {
+  try {
+    const decodedToken = await verifySession(request);
+    if (!await isAdmin(decodedToken.uid)) {
+      return NextResponse.json({ error: 'Unauthorized: Admin access required.' }, { status: 403 });
+    }
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 401 });
+  }
+
   let body;
   try {
     body = await request.json();

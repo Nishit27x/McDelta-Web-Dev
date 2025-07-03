@@ -9,8 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Terminal } from 'lucide-react';
+import { ArrowLeft, Terminal, ShieldAlert, LogIn } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useUserSession } from '@/contexts/user-session-context';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // The main component for the RCON console UI
 const RconConsoleView = () => {
@@ -167,11 +169,83 @@ const RconConsoleView = () => {
 
 
 export default function AdminPage() {
+  const { profile, isLoading } = useUserSession();
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <Card className="w-full max-w-4xl">
+          <CardHeader>
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-4 w-64 mt-2" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-[50vh] w-full" />
+            <div className="flex gap-2 mt-4">
+              <Skeleton className="h-10 flex-grow" />
+              <Skeleton className="h-10 w-24" />
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    if (!profile) {
+      return (
+        <Card className="w-full max-w-md text-center">
+            <CardHeader>
+                <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit">
+                    <LogIn className="h-12 w-12 text-primary" />
+                </div>
+                <CardTitle className="mt-4">Authentication Required</CardTitle>
+                <CardDescription>
+                    Please sign in to access the admin console.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Button asChild>
+                    <Link href="/">
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Back to Home
+                    </Link>
+                </Button>
+            </CardContent>
+        </Card>
+      );
+    }
+
+    if (!profile.isAdmin) {
+      return (
+        <Card className="w-full max-w-md text-center">
+            <CardHeader>
+                <div className="mx-auto bg-destructive/10 p-4 rounded-full w-fit">
+                    <ShieldAlert className="h-12 w-12 text-destructive" />
+                </div>
+                <CardTitle className="mt-4">Access Denied</CardTitle>
+                <CardDescription>
+                    You do not have permission to view this page. Admin access is required.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Button asChild>
+                    <Link href="/">
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Back to Home
+                    </Link>
+                </Button>
+            </CardContent>
+        </Card>
+      );
+    }
+
+    return <RconConsoleView />;
+  };
+
   return (
     <div className="flex flex-col min-h-dvh bg-background">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-16 flex items-center justify-center">
-        <RconConsoleView />
+        {renderContent()}
       </main>
       <Footer />
     </div>
