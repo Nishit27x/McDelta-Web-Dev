@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { auth } from '@/lib/firebase-client';
 import { signInWithCustomToken } from 'firebase/auth';
+import { useUserSession } from '@/contexts/user-session-context';
 
 const signInSchema = z.object({
   gamertag: z.string().min(3, 'Gamertag must be at least 3 characters.').max(20, 'Gamertag cannot be longer than 20 characters.'),
@@ -24,6 +25,7 @@ interface SignInModalProps {
 export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { logout } = useUserSession();
 
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -65,20 +67,25 @@ export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ idToken })
       });
+      if (!sessionResponse.ok) throw new Error((await sessionResponse.json()).error || 'Failed to create a session.');
 
-      const sessionData = await sessionResponse.json();
-      if (!sessionResponse.ok) throw new Error(sessionData.error || 'Failed to create a session.');
+      // Step 4: Verify if the newly logged-in user is an admin
+      const profileResponse = await fetch('/api/user/session');
+      const profileData = await profileResponse.json();
+      if (!profileResponse.ok) throw new Error(profileData.error || 'Could not verify admin status.');
 
-      toast({
-        title: 'Welcome to McDelta!',
-        description: `You are now signed in as ${values.gamertag}.`,
-      });
-      onSuccess();
+      // Step 5: Check admin flag and proceed or deny access
+      if (profileData.isAdmin) {
+          onSuccess();
+      } else {
+          await logout(); // Log out the non-admin user immediately
+          throw new Error('Access Denied. You do not have admin privileges.');
+      }
 
     } catch (error) {
       toast({
         variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
+        title: 'Sign-in Failed',
         description: (error as Error).message,
       });
     } finally {
@@ -90,9 +97,9 @@ export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
     <Dialog open={true} onOpenChange={(isOpen) => !isOpen && onCancel()}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Sign In</DialogTitle>
+          <DialogTitle>Admin Sign In</DialogTitle>
           <DialogDescription>
-            Please enter your Minecraft Gamertag. This will create a secure session for you.
+            Please enter your Minecraft Gamertag to access the admin panel.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -104,7 +111,7 @@ export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
                 <FormItem>
                   <FormLabel>Minecraft Gamertag</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Steve" {...field} />
+                    <Input placeholder="e.g., LegendHacker27" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -115,7 +122,7 @@ export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Signing In...' : 'Sign In'}
+                {isSubmitting ? 'Verifying...' : 'Sign In'}
               </Button>
             </DialogFooter>
           </form>
