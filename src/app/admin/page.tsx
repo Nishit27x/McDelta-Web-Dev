@@ -9,11 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, ShieldAlert, Terminal } from 'lucide-react';
+import { ArrowLeft, Terminal } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useUserSession, AuthWrapper } from '@/contexts/user-session-context';
-import SignInModal from '@/components/sign-in-modal';
-import { Skeleton } from '@/components/ui/skeleton';
 
 // The main component for the console UI
 const ConsoleView = () => {
@@ -127,70 +124,13 @@ const ConsoleView = () => {
   );
 };
 
-// This component handles the logic for displaying content based on auth state.
-function AdminPageContent() {
-    const { profile, isLoading } = useUserSession();
-    const [showSignIn, setShowSignIn] = useState(false);
-
-    useEffect(() => {
-        // If the user is not logged in after the initial check, prompt them to sign in.
-        if (!isLoading && !profile) {
-            setShowSignIn(true);
-        }
-    }, [isLoading, profile]);
-
-    if (isLoading) {
-        return (
-            <div className="w-full max-w-4xl h-[75vh] p-4">
-                <Skeleton className="h-full w-full" />
-            </div>
-        );
-    }
-    
-    // If user is not an admin (or not logged in), show an access denied message.
-    if (!profile?.isAdmin) {
-        return (
-            <>
-                <Card className="w-full max-w-md text-center border-destructive">
-                    <CardHeader>
-                    <div className="mx-auto bg-destructive/10 p-4 rounded-full w-fit">
-                        <ShieldAlert className="h-12 w-12 text-destructive" />
-                    </div>
-                    <CardTitle className="mt-4 text-destructive">Admin Access Required</CardTitle>
-                    <CardDescription>
-                        You do not have permission to view this page. Please sign in with an admin account.
-                    </CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex flex-col items-center gap-4">
-                        <Button onClick={() => setShowSignIn(true)} variant="default" className="w-full">
-                            Sign In
-                        </Button>
-                        <Button asChild variant="outline" className="w-full">
-                            <Link href="/">
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to Home
-                            </Link>
-                        </Button>
-                    </CardContent>
-                </Card>
-                {showSignIn && <SignInModal onSuccess={() => window.location.reload()} onCancel={() => setShowSignIn(false)} />}
-            </>
-        );
-    }
-    
-    // If the user is an admin, show the console.
-    return <ConsoleView />;
-}
-
 
 export default function AdminPage() {
   return (
     <div className="flex flex-col min-h-dvh bg-background">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-16 flex items-center justify-center">
-        <AuthWrapper>
-            <AdminPageContent />
-        </AuthWrapper>
+        <ConsoleView />
       </main>
       <Footer />
     </div>
