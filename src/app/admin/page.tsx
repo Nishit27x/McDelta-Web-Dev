@@ -20,6 +20,7 @@ const RconConsoleView = () => {
   const [historyIndex, setHistoryIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const outputRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -28,6 +29,11 @@ const RconConsoleView = () => {
       outputRef.current.scrollTop = outputRef.current.scrollHeight;
     }
   }, [output]);
+
+  useEffect(() => {
+    // Focus the input on initial load
+    inputRef.current?.focus();
+  }, []);
 
   const handleSendCommand = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,6 +80,7 @@ const RconConsoleView = () => {
     } finally {
       setCommand('');
       setIsSubmitting(false);
+      inputRef.current?.focus();
     }
   };
 
@@ -124,6 +131,7 @@ const RconConsoleView = () => {
         </div>
         <form onSubmit={handleSendCommand} className="flex gap-2">
           <Input
+            ref={inputRef}
             type="text"
             value={command}
             onChange={(e) => setCommand(e.target.value)}
@@ -131,7 +139,6 @@ const RconConsoleView = () => {
             placeholder="Enter a command... (e.g., 'list')"
             disabled={isSubmitting}
             className="font-mono flex-grow"
-            autoFocus
           />
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Sending...' : 'Send'}
