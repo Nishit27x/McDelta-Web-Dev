@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "./ui/sheet";
 import { Menu } from "lucide-react";
+import UserNav from "./user-nav";
 
 const DiamondIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -36,12 +37,9 @@ export default function Header() {
           <Link href="/rules" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Rules</Link>
           <Link href="/status" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Server Status</Link>
           <Link href="/feedback" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Feedback</Link>
-          <Link href="/admin" className="text-muted-foreground transition-colors hover:text-foreground" suppressHydrationWarning>Admin</Link>
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <Button asChild>
-            <a href="https://discord.gg/bwXrXzH3Wt" target="_blank" rel="noopener noreferrer">Join Now</a>
-          </Button>
+          <UserNav />
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="md:hidden">
