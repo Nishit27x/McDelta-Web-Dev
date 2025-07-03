@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -11,10 +12,10 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { auth } from '@/lib/firebase-client';
 import { signInWithCustomToken } from 'firebase/auth';
-import { useUserSession } from '@/contexts/user-session-context';
 
 const signInSchema = z.object({
-  gamertag: z.string().min(3, 'Gamertag must be at least 3 characters.').max(20, 'Gamertag cannot be longer than 20 characters.'),
+  username: z.string().min(1, 'Username is required.'),
+  password: z.string().min(1, 'Password is required.'),
 });
 
 interface SignInModalProps {
@@ -25,12 +26,12 @@ interface SignInModalProps {
 export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const { logout } = useUserSession();
 
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      gamertag: '',
+      username: '',
+      password: '',
     },
   });
 
@@ -48,11 +49,11 @@ export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
     }
 
     try {
-      // Step 1: Get custom token from our backend
-      const loginResponse = await fetch('/api/auth/login', {
+      // Step 1: Get custom token from our backend using username/password
+      const loginResponse = await fetch('/api/auth/admin-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ gamertag: values.gamertag }),
+        body: JSON.stringify({ username: values.username, password: values.password }),
       });
       const loginData = await loginResponse.json();
       if (!loginResponse.ok) throw new Error(loginData.error || 'Failed to start login process.');
@@ -69,18 +70,8 @@ export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
       });
       if (!sessionResponse.ok) throw new Error((await sessionResponse.json()).error || 'Failed to create a session.');
 
-      // Step 4: Verify if the newly logged-in user is an admin
-      const profileResponse = await fetch('/api/user/session');
-      const profileData = await profileResponse.json();
-      if (!profileResponse.ok) throw new Error(profileData.error || 'Could not verify admin status.');
-
-      // Step 5: Check admin flag and proceed or deny access
-      if (profileData.isAdmin) {
-          onSuccess();
-      } else {
-          await logout(); // Log out the non-admin user immediately
-          throw new Error('Access Denied. You do not have admin privileges.');
-      }
+      // Step 4: Login was successful, trigger the success handler
+      onSuccess();
 
     } catch (error) {
       toast({
@@ -99,19 +90,32 @@ export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
         <DialogHeader>
           <DialogTitle>Admin Sign In</DialogTitle>
           <DialogDescription>
-            Please enter your Minecraft Gamertag to access the admin panel.
+            Please enter your administrator credentials.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="gamertag"
+              name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Minecraft Gamertag</FormLabel>
+                  <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., LegendHacker27" {...field} />
+                    <Input placeholder="Enter username" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="Enter password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
