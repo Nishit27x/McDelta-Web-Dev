@@ -12,12 +12,11 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Terminal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// The main component for the console UI
-const ConsoleView = () => {
-  const [output, setOutput] = useState<string[]>(['Attempting to connect to live console...']);
+// The main component for the RCON console UI
+const RconConsoleView = () => {
+  const [output, setOutput] = useState<string[]>(['Welcome to the RCON console.']);
   const [command, setCommand] = useState('');
-  const [connectionStatus, setConnectionStatus] = useState('connecting'); // connecting, connected, disconnected, error
-  const ws = useRef<WebSocket | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const outputRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -28,156 +27,54 @@ const ConsoleView = () => {
     }
   }, [output]);
 
-  useEffect(() => {
-    const connect = async () => {
-      try {
-        const res = await fetch('/api/live-console');
-
-        if (!res.ok) {
-          let errorMsg = `API Error: ${res.status} ${res.statusText}`;
-          try {
-            const errorData = await res.json();
-            errorMsg = errorData.error || errorMsg;
-          } catch (e) {
-            // The response was not JSON, which can happen for various reasons.
-            // We'll stick with the original status text.
-          }
-          throw new Error(errorMsg);
-        }
-        
-        const { token, socketUrl } = await res.json();
-
-        ws.current = new WebSocket(socketUrl);
-
-        ws.current.onopen = () => {
-          ws.current?.send(JSON.stringify({ event: 'auth', args: [token] }));
-        };
-
-        ws.current.onmessage = (event) => {
-          try {
-            const data = JSON.parse(event.data);
-          
-            switch (data.event) {
-              case 'auth success':
-                setConnectionStatus('connected');
-                setOutput(prev => [...prev, '✔ Connection successful. Welcome to the live console.']);
-                // Request initial logs
-                ws.current?.send(JSON.stringify({ event: "send logs", args: [] }));
-                break;
-              case 'console output':
-                setOutput(prev => [...prev, ...data.args]);
-                break;
-              case 'status':
-                setOutput(prev => [...prev, `Server status changed to: ${data.args[0]}`]);
-                break;
-              case 'token expiring':
-                setOutput(prev => [...prev, 'Connection token is expiring. Please refresh the page to reconnect.']);
-                break;
-              case 'token expired':
-                setConnectionStatus('error');
-                setOutput(prev => [...prev, 'Connection token expired. Please refresh the page.']);
-                ws.current?.close();
-                break;
-              default:
-                break;
-            }
-          } catch(e) {
-             console.error("Failed to parse WebSocket message", e);
-          }
-        };
-
-        ws.current.onerror = (error) => {
-          console.error('WebSocket Error:', error);
-          setConnectionStatus('error');
-          setOutput(prev => [...prev, 'Error: Could not establish a live connection. The server might be offline or an API key is invalid.']);
-          toast({ variant: 'destructive', title: 'Connection Error', description: 'Could not establish a live connection to the server.' });
-        };
-
-        ws.current.onclose = (event) => {
-          // If the connection closes while we were still in the 'connecting' state, it's an error.
-          if (connectionStatus === 'connecting') {
-            setConnectionStatus('error');
-            setOutput(prev => [...prev, 'Error: Connection failed unexpectedly. The server may be offline or restarting.']);
-            toast({ variant: 'destructive', title: 'Connection Failed', description: 'Could not connect to the live console.' });
-            return;
-          }
-          // If it closes and it wasn't a clean close (e.g. server crash), and we aren't already showing an error.
-          if (!event.wasClean && connectionStatus !== 'error') {
-            setConnectionStatus('disconnected');
-            setOutput(prev => [...prev, 'Connection closed.']);
-          }
-        };
-
-      } catch (error) {
-        setConnectionStatus('error');
-        const errorMessage = (error as Error).message;
-        let userFriendlyMessage = `Error: ${errorMessage}`;
-        let toastDescription = errorMessage;
-
-        if (errorMessage.includes('Server configuration error')) {
-            userFriendlyMessage = 'Error: Server configuration error. The Pterodactyl API keys seem to be missing or incorrect.';
-            toastDescription = 'Please ensure your Pterodactyl API keys are set correctly in a .env.local file and that you have restarted the development server. If deployed, check your hosting provider\'s environment variables.';
-        } else if (errorMessage.includes('Failed to get live console credentials')) {
-            toastDescription = 'This could be due to an incorrect Server ID or an issue with the Pterodactyl panel. Please verify your settings.';
-        }
-
-        setOutput(prev => [...prev, userFriendlyMessage]);
-        toast({ 
-            variant: 'destructive', 
-            title: 'Connection Failed', 
-            description: toastDescription,
-            duration: 10000 // Give more time to read
-        });
-      }
-    };
-
-    connect();
-
-    // Cleanup on component unmount
-    return () => {
-      if (ws.current) {
-        ws.current.onclose = null; // prevent onclose from running on manual close
-        ws.current.close();
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-
-  const handleSendCommand = (e: React.FormEvent) => {
+  const handleSendCommand = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedCommand = command.trim();
-    if (!trimmedCommand || connectionStatus !== 'connected' || !ws.current) return;
-    
-    // Pterodactyl doesn't echo the command, so we do it manually.
+    if (!trimmedCommand || isSubmitting) return;
+
+    setIsSubmitting(true);
     setOutput(prev => [...prev, `> ${trimmedCommand}`]);
-    ws.current.send(JSON.stringify({ event: 'send command', args: [trimmedCommand] }));
-    setCommand('');
+
+    try {
+      const response = await fetch('/api/rcon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: trimmedCommand }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'An unknown error occurred.');
+      }
+      
+      const responseText = result.response || '(No response from server)';
+      setOutput(prev => [...prev, responseText]);
+
+    } catch (error) {
+      const errorMessage = (error as Error).message;
+      setOutput(prev => [...prev, `Error: ${errorMessage}`]);
+      toast({
+        variant: 'destructive',
+        title: 'Command Failed',
+        description: errorMessage,
+      });
+    } finally {
+      setCommand('');
+      setIsSubmitting(false);
+    }
   };
-  
-  const isSendingDisabled = connectionStatus !== 'connected';
 
   return (
     <Card className="w-full max-w-4xl h-[75vh] flex flex-col">
       <CardHeader>
-        <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-                <div className="p-3 bg-primary/10 rounded-full border-2 border-primary/20">
-                    <Terminal className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                    <CardTitle>Live Server Console</CardTitle>
-                    <CardDescription>Execute commands and view the live server log.</CardDescription>
-                </div>
+        <div className="flex items-center gap-4">
+            <div className="p-3 bg-primary/10 rounded-full border-2 border-primary/20">
+                <Terminal className="h-6 w-6 text-primary" />
             </div>
-            <div className="flex items-center gap-2" title={`Status: ${connectionStatus}`}>
-                <div className={cn('h-3 w-3 rounded-full', {
-                    'bg-yellow-400 animate-pulse': connectionStatus === 'connecting',
-                    'bg-online': connectionStatus === 'connected',
-                    'bg-destructive': connectionStatus === 'error',
-                    'bg-muted-foreground': connectionStatus === 'disconnected',
-                })} />
-                <span className="text-sm capitalize text-muted-foreground">{connectionStatus}</span>
+            <div>
+                <CardTitle>RCON Console</CardTitle>
+                <CardDescription>Execute commands on the server via RCON.</CardDescription>
             </div>
         </div>
       </CardHeader>
@@ -185,7 +82,7 @@ const ConsoleView = () => {
         <div ref={outputRef} className="flex-grow bg-muted rounded-md p-4 overflow-y-auto font-mono text-sm space-y-1 mb-4 h-full">
           {output.map((line, index) => (
             <p key={index} className={cn('whitespace-pre-wrap break-words',
-              line.startsWith('>') ? 'text-primary' : (line.startsWith('Error:') || line.startsWith('Connection token expired') ? 'text-destructive' : 'text-muted-foreground')
+              line.startsWith('>') ? 'text-primary' : (line.startsWith('Error:') ? 'text-destructive' : 'text-muted-foreground')
             )}>
               {line.replace(/§[0-9a-fk-or]/g, '')}
             </p>
@@ -196,13 +93,13 @@ const ConsoleView = () => {
             type="text"
             value={command}
             onChange={(e) => setCommand(e.target.value)}
-            placeholder={isSendingDisabled ? "Waiting for connection..." : "Enter a command..."}
-            disabled={isSendingDisabled}
+            placeholder="Enter a command... (e.g., 'list')"
+            disabled={isSubmitting}
             className="font-mono flex-grow"
             autoFocus
           />
-          <Button type="submit" disabled={isSendingDisabled}>
-            {connectionStatus === 'connecting' ? 'Connecting...' : 'Send'}
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Sending...' : 'Send'}
           </Button>
         </form>
       </CardContent>
@@ -224,7 +121,7 @@ export default function AdminPage() {
     <div className="flex flex-col min-h-dvh bg-background">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-16 flex items-center justify-center">
-        <ConsoleView />
+        <RconConsoleView />
       </main>
       <Footer />
     </div>
