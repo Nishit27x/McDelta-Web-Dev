@@ -54,15 +54,15 @@ export default function CreditsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center gap-6">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 w-full pt-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 w-full pt-6">
                 {credits.map((person) => (
                     <div key={person.name} className="flex flex-col items-center gap-2 text-center">
-                        <div className="h-24 w-24 flex items-center justify-center">
-                            <Crown className={cn("w-20 h-20", person.crownClass)} />
+                        <div className="h-20 w-20 sm:h-24 sm:w-24 flex items-center justify-center">
+                            <Crown className={cn("w-16 h-16 sm:w-20 sm:h-20", person.crownClass)} />
                         </div>
-                        <h4 className={cn("font-headline font-bold text-2xl", person.nameClass)}>{person.name}</h4>
+                        <h4 className={cn("font-headline font-bold text-xl md:text-2xl break-words", person.nameClass)}>{person.name}</h4>
                         {person.realName && (
-                            <p className="font-semibold text-lg text-foreground/90 drop-shadow-[0_0_10px_hsl(var(--primary)/0.5)]">
+                            <p className="font-semibold text-base md:text-lg text-foreground/90 drop-shadow-[0_0_10px_hsl(var(--primary)/0.5)]">
                                 ({person.realName})
                             </p>
                         )}
