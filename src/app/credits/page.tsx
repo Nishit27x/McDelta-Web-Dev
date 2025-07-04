@@ -1,3 +1,4 @@
+
 import Header from '@/components/header';
 import Footer from '@/components/landing/footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -9,24 +10,28 @@ import { cn } from '@/lib/utils';
 const credits = [
     {
         name: "LegendHacker27",
+        realName: "Nishit P.",
         role: "lead",
         crownClass: "text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.7)]",
         nameClass: "text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.7)]",
     },
     {
         name: "Tobbler_",
+        realName: "IdealCartoon",
         role: "admin",
         crownClass: "text-lime-400 drop-shadow-[0_0_10px_rgba(163,230,53,0.7)]",
         nameClass: "text-lime-400 drop-shadow-[0_0_5px_rgba(163,230,53,0.7)]",
     },
     {
         name: "VaibhavOp345",
+        realName: "Vaibhav",
         role: "admin",
         crownClass: "text-purple-400 drop-shadow-[0_0_10px_rgba(192,132,252,0.7)]",
         nameClass: "text-purple-400 drop-shadow-[0_0_5px_rgba(192,132,252,0.7)]",
     },
     {
         name: "Mrkiller0033",
+        realName: "Siddharth A.",
         role: "admin",
         crownClass: "text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.7)]",
         nameClass: "text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.7)]",
@@ -51,11 +56,16 @@ export default function CreditsPage() {
           <CardContent className="flex flex-col items-center gap-6">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 w-full pt-6">
                 {credits.map((person) => (
-                    <div key={person.name} className="flex flex-col items-center gap-4">
+                    <div key={person.name} className="flex flex-col items-center gap-2 text-center">
                         <div className="h-24 w-24 flex items-center justify-center">
                             <Crown className={cn("w-20 h-20", person.crownClass)} />
                         </div>
-                        <h4 className={cn("font-headline font-bold text-2xl mt-2", person.nameClass)}>{person.name}</h4>
+                        <h4 className={cn("font-headline font-bold text-2xl", person.nameClass)}>{person.name}</h4>
+                        {person.realName && (
+                            <p className="font-semibold text-lg text-foreground/90 drop-shadow-[0_0_10px_hsl(var(--primary)/0.5)]">
+                                ({person.realName})
+                            </p>
+                        )}
                     </div>
                 ))}
             </div>
