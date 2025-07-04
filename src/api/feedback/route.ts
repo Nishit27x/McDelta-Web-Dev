@@ -1,4 +1,3 @@
-
 import { type NextRequest, NextResponse } from 'next/server';
 import admin from '@/lib/firebase-admin';
 import * as z from 'zod';
@@ -43,10 +42,6 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  if (!isFirebaseAdminInitialized()) {
-    return NextResponse.json({ error: 'Server not configured for feedback.' }, { status: 503 });
-  }
-    
   let body;
   try {
     body = await request.json();
@@ -74,7 +69,6 @@ export async function POST(request: NextRequest) {
         rating,
         avatar: `https://crafatar.com/avatars/${anonymousId}?overlay`, // Generic but unique avatar
         createdAt: Date.now(),
-        uid: anonymousId, // use randomId as a unique identifier for the avatar
     };
 
     const newReviewRef = await ref.push(newReview);

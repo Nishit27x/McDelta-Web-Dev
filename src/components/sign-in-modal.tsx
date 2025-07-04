@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -13,7 +14,8 @@ import { auth } from '@/lib/firebase-client';
 import { signInWithCustomToken } from 'firebase/auth';
 
 const signInSchema = z.object({
-  gamertag: z.string().min(3, 'Gamertag must be at least 3 characters.').max(20, 'Gamertag cannot be longer than 20 characters.'),
+  username: z.string().min(1, 'Username is required.'),
+  password: z.string().min(1, 'Password is required.'),
 });
 
 interface SignInModalProps {
@@ -28,7 +30,8 @@ export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      gamertag: '',
+      username: '',
+      password: '',
     },
   });
 
@@ -46,11 +49,11 @@ export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
     }
 
     try {
-      // Step 1: Get custom token from our backend
-      const loginResponse = await fetch('/api/auth/login', {
+      // Step 1: Get custom token from our backend using username/password
+      const loginResponse = await fetch('/api/auth/admin-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ gamertag: values.gamertag }),
+        body: JSON.stringify({ username: values.username, password: values.password }),
       });
       const loginData = await loginResponse.json();
       if (!loginResponse.ok) throw new Error(loginData.error || 'Failed to start login process.');
@@ -65,20 +68,15 @@ export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ idToken })
       });
+      if (!sessionResponse.ok) throw new Error((await sessionResponse.json()).error || 'Failed to create a session.');
 
-      const sessionData = await sessionResponse.json();
-      if (!sessionResponse.ok) throw new Error(sessionData.error || 'Failed to create a session.');
-
-      toast({
-        title: 'Welcome to McDelta!',
-        description: `You are now signed in as ${values.gamertag}.`,
-      });
+      // Step 4: Login was successful, trigger the success handler
       onSuccess();
 
     } catch (error) {
       toast({
         variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
+        title: 'Sign-in Failed',
         description: (error as Error).message,
       });
     } finally {
@@ -90,21 +88,34 @@ export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
     <Dialog open={true} onOpenChange={(isOpen) => !isOpen && onCancel()}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Sign In</DialogTitle>
+          <DialogTitle>Admin Sign In</DialogTitle>
           <DialogDescription>
-            Please enter your Minecraft Gamertag. This will create a secure session for you.
+            Please enter your administrator credentials.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="gamertag"
+              name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Minecraft Gamertag</FormLabel>
+                  <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Steve" {...field} />
+                    <Input placeholder="Enter username" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="Enter password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -115,7 +126,7 @@ export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Signing In...' : 'Sign In'}
+                {isSubmitting ? 'Verifying...' : 'Sign In'}
               </Button>
             </DialogFooter>
           </form>

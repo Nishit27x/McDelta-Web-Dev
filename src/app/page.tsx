@@ -4,6 +4,7 @@ import About from '@/components/landing/about';
 import Features from '@/components/landing/features';
 import Join from '@/components/landing/join';
 import Footer from '@/components/landing/footer';
+import Feedback from '@/components/landing/feedback';
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
         <Hero />
         <About />
         <Features />
+        <Feedback />
         <Join />
       </main>
       <Footer />
