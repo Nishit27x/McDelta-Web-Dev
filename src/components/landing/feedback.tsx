@@ -8,6 +8,8 @@ import Autoplay from 'embla-carousel-autoplay';
 import * as React from 'react';
 import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
+import { app } from '@/lib/firebase-client';
+import { getDatabase, ref, onValue, query, orderByChild, limitToLast } from 'firebase/database';
 
 interface Review {
   id: string;
@@ -28,25 +30,39 @@ export default function Feedback() {
   );
 
   React.useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch('/api/feedback');
-        const data = await response.json();
-        if (response.ok) {
-          setReviews(data);
-        } else {
-          setReviews([]);
-        }
-      } catch (error) {
-        console.error("Failed to fetch reviews:", error);
+    if (!app) {
+      console.warn("Firebase is not configured. Feedback will not be loaded.");
+      setIsLoading(false);
+      return;
+    }
+
+    const db = getDatabase(app);
+    const reviewsRef = ref(db, 'reviews');
+    // Query to get the last 10 reviews, ordered by creation time
+    const recentReviewsQuery = query(reviewsRef, orderByChild('createdAt'), limitToLast(10));
+
+    const unsubscribe = onValue(recentReviewsQuery, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const reviewsArray: Review[] = Object.keys(data).map(key => ({
+          id: key,
+          ...data[key],
+        })).sort((a, b) => b.createdAt - a.createdAt); // Sort descending (newest first)
+        setReviews(reviewsArray);
+      } else {
         setReviews([]);
-      } finally {
-        setIsLoading(false);
       }
-    };
-    fetchReviews();
+      setIsLoading(false);
+    }, (error) => {
+      console.error("Failed to fetch reviews:", error);
+      setReviews([]);
+      setIsLoading(false);
+    });
+
+    // Cleanup subscription on component unmount
+    return () => unsubscribe();
   }, []);
+
 
   const renderContent = () => {
     if (isLoading) {
@@ -75,7 +91,7 @@ export default function Feedback() {
     return (
       <Carousel 
           plugins={[plugin.current]}
-          opts={{ loop: true }} 
+          opts={{ loop: reviews.length > 1 }} 
           className="w-full"
           onMouseEnter={plugin.current.stop}
           onMouseLeave={plugin.current.reset}

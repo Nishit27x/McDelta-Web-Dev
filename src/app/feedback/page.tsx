@@ -14,6 +14,8 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Star, MessageSquareQuote } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { app } from '@/lib/firebase-client';
+import { getDatabase, ref, push } from 'firebase/database';
 
 const feedbackSchema = z.object({
   name: z.string().min(3, "Your name must be at least 3 characters.").max(20, "Your name is too long."),
@@ -56,16 +58,30 @@ const FeedbackForm = () => {
 
     async function onSubmit(values: z.infer<typeof feedbackSchema>) {
         setIsSubmitting(true);
-        try {
-            const response = await fetch('/api/feedback', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(values),
+        if (!app) {
+            toast({
+                variant: 'destructive',
+                title: 'Submission Failed',
+                description: 'Firebase is not configured. Please contact an administrator.',
             });
-            const result = await response.json();
-            if (!response.ok) {
-                throw new Error(result.error || 'Something went wrong.');
-            }
+            setIsSubmitting(false);
+            return;
+        }
+
+        try {
+            const db = getDatabase(app);
+            const reviewsRef = ref(db, 'reviews');
+            
+            const anonymousId = crypto.randomUUID();
+            const newReview = {
+                ...values,
+                avatar: `https://crafatar.com/avatars/${anonymousId}?overlay`,
+                createdAt: Date.now(),
+                uid: anonymousId,
+            };
+
+            await push(reviewsRef, newReview);
+
             toast({
                 title: 'Feedback Submitted!',
                 description: "Thanks for helping us improve McDelta SMP.",
@@ -75,7 +91,7 @@ const FeedbackForm = () => {
             toast({
                 variant: 'destructive',
                 title: 'Submission Failed',
-                description: (error as Error).message,
+                description: (error as Error).message || 'Could not submit feedback to the database.',
             });
         } finally {
             setIsSubmitting(false);

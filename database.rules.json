@@ -2,7 +2,11 @@
   "rules": {
     "reviews": {
       ".read": true,
-      ".write": false
+      "$reviewId": {
+        "//": "New reviews can be created, but existing ones cannot be overwritten or deleted.",
+        ".write": "!data.exists() && newData.exists()",
+        ".validate": "newData.hasChildren(['name', 'message', 'rating', 'createdAt', 'avatar', 'uid']) && newData.child('name').isString() && newData.child('message').isString() && newData.child('rating').isNumber() && newData.child('createdAt').isNumber() && newData.child('avatar').isString() && newData.child('uid').isString()"
+      }
     },
     "galleryImages": {
       ".read": true,
