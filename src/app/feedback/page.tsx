@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -12,10 +12,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Star, MessageSquareQuote } from 'lucide-react';
+import { Star, MessageSquareQuote, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { app } from '@/lib/firebase-client';
 import { getDatabase, ref, push } from 'firebase/database';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const feedbackSchema = z.object({
   name: z.string().min(3, "Your name must be at least 3 characters.").max(20, "Your name is too long."),
@@ -45,7 +46,21 @@ const StarRating = ({ value, onChange }: { value: number, onChange: (value: numb
 
 const FeedbackForm = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [hasSubmitted, setHasSubmitted] = useState(false);
+    const [isChecking, setIsChecking] = useState(true);
     const { toast } = useToast();
+
+    useEffect(() => {
+        try {
+            if (localStorage.getItem('hasSubmittedFeedback') === 'true') {
+                setHasSubmitted(true);
+            }
+        } catch (error) {
+            console.warn("Could not access localStorage. Feedback can be submitted multiple times.");
+        } finally {
+            setIsChecking(false);
+        }
+    }, []);
 
     const form = useForm<z.infer<typeof feedbackSchema>>({
         resolver: zodResolver(feedbackSchema),
@@ -87,6 +102,12 @@ const FeedbackForm = () => {
                 description: "Thanks for helping us improve McDelta SMP.",
             });
             form.reset();
+            try {
+                localStorage.setItem('hasSubmittedFeedback', 'true');
+            } catch (error) {
+                 console.warn("Could not set localStorage. Feedback can be submitted multiple times.");
+            }
+            setHasSubmitted(true);
         } catch (error) {
             toast({
                 variant: 'destructive',
@@ -96,6 +117,42 @@ const FeedbackForm = () => {
         } finally {
             setIsSubmitting(false);
         }
+    }
+    
+    if (isChecking) {
+        return (
+            <Card className="w-full max-w-lg">
+                <CardHeader className="text-center">
+                    <Skeleton className="h-16 w-16 rounded-full mx-auto" />
+                    <Skeleton className="h-8 w-48 mt-4 mx-auto" />
+                    <Skeleton className="h-5 w-64 mt-2 mx-auto" />
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                </CardContent>
+                <CardFooter>
+                    <Skeleton className="h-10 w-full" />
+                </CardFooter>
+            </Card>
+        )
+    }
+
+    if (hasSubmitted) {
+        return (
+             <Card className="w-full max-w-lg">
+                <CardHeader className="text-center">
+                    <div className="mx-auto bg-green-500/10 p-4 rounded-full w-fit">
+                        <CheckCircle2 className="h-12 w-12 text-green-500" />
+                    </div>
+                    <CardTitle className="mt-4">Thank You!</CardTitle>
+                    <CardDescription>
+                        Your feedback has already been submitted. We appreciate you taking the time to help us improve.
+                    </CardDescription>
+                </CardHeader>
+            </Card>
+        );
     }
     
     return (
