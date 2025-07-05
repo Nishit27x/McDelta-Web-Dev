@@ -43,8 +43,24 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  if (!isFirebaseAdminInitialized()) {
-    return NextResponse.json({ error: 'Server not configured for feedback.' }, { status: 503 });
+  // Explicitly check for necessary environment variables to provide a better error.
+  const hasFirebaseAdminConfig = 
+    process.env.FIREBASE_PROJECT_ID &&
+    process.env.FIREBASE_CLIENT_EMAIL &&
+    process.env.FIREBASE_PRIVATE_KEY &&
+    process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL;
+
+  if (!hasFirebaseAdminConfig || !isFirebaseAdminInitialized()) {
+    const missingVars = [
+        !process.env.FIREBASE_PROJECT_ID && 'FIREBASE_PROJECT_ID',
+        !process.env.FIREBASE_CLIENT_EMAIL && 'FIREBASE_CLIENT_EMAIL',
+        !process.env.FIREBASE_PRIVATE_KEY && 'FIREBASE_PRIVATE_KEY',
+        !process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL && 'NEXT_PUBLIC_FIREBASE_DATABASE_URL',
+    ].filter(Boolean).join(', ');
+
+    const errorMessage = `Server not configured for feedback. Missing environment variables: ${missingVars || 'unknown'}. Please add them to your hosting provider.`;
+    console.error(`Feedback submission failed: ${errorMessage}`);
+    return NextResponse.json({ error: errorMessage }, { status: 503 });
   }
     
   let body;
