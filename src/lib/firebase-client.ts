@@ -25,15 +25,21 @@ const firebaseConfig = {
 
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
+let firebaseClientError: string | null = null;
 
 // Only initialize Firebase if all the necessary client-side keys are set
-if (firebaseConfig.apiKey && firebaseConfig.authDomain && firebaseConfig.projectId) {
+const hasRequiredKeys = firebaseConfig.apiKey && firebaseConfig.authDomain && firebaseConfig.projectId;
+
+if (hasRequiredKeys) {
   try {
     app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     auth = getAuth(app);
   } catch (error) {
      console.error('Firebase client initialization error', error);
+     firebaseClientError = 'Firebase failed to initialize on the client. Check browser console for details.';
   }
+} else {
+    firebaseClientError = 'Missing public Firebase credentials. Add NEXT_PUBLIC_FIREBASE... environment variables to your hosting provider.';
 }
 
-export { app, auth };
+export { app, auth, firebaseClientError };

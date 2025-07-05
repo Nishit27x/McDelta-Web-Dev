@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Star, MessageSquareQuote, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { app } from '@/lib/firebase-client';
+import { app, firebaseClientError } from '@/lib/firebase-client';
 import { getDatabase, ref, push } from 'firebase/database';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -77,7 +77,7 @@ const FeedbackForm = () => {
             toast({
                 variant: 'destructive',
                 title: 'Submission Failed',
-                description: 'Firebase is not configured. Please contact an administrator.',
+                description: firebaseClientError || 'Firebase is not configured. Please contact an administrator.',
             });
             setIsSubmitting(false);
             return;

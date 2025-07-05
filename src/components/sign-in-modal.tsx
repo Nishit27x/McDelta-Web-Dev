@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -10,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { auth } from '@/lib/firebase-client';
+import { auth, firebaseClientError } from '@/lib/firebase-client';
 import { signInWithCustomToken } from 'firebase/auth';
 
 const signInSchema = z.object({
@@ -42,7 +41,7 @@ export default function SignInModal({ onSuccess, onCancel }: SignInModalProps) {
         toast({
             variant: 'destructive',
             title: 'Authentication Unavailable',
-            description: 'The server is not configured for authentication. Please contact an administrator.',
+            description: firebaseClientError || 'The server is not configured for authentication. Please contact an administrator.',
         });
         setIsSubmitting(false);
         return;
